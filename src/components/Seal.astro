@@ -1,0 +1,78 @@
+---
+/**
+ * Monasterie seal: oval badge, window-and-star icon in the centre,
+ * MONASTERIE across the top, CONVERSATIO MORUM along the bottom.
+ *
+ * Assembled from the brand marks until the finished seal artwork exists.
+ * To swap in the final seal, replace the <svg> below with its paths and
+ * keep the class names; the homepage only relies on .seal and its size.
+ *
+ * Colours follow the ground: --logo-main for line and type, --logo-star
+ * for the star, cerulean for the decorative inner ring.
+ */
+import { LOGOS } from './logo-paths';
+
+interface Props {
+  class?: string;
+  decorative?: boolean;
+}
+const { class: className, decorative = false } = Astro.props;
+const icon = LOGOS.icon;
+const id = `seal-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 300 380"
+  class:list={['seal', className]}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : 'Monasterie seal: Conversatio Morum'}
+  aria-hidden={decorative ? 'true' : undefined}
+  focusable="false"
+>
+  <defs>
+    <path id={`${id}-top`} d="M 30 190 A 120 160 0 0 1 270 190" />
+    <path id={`${id}-bottom`} d="M 30 190 A 120 160 0 0 0 270 190" />
+  </defs>
+
+  <!-- rings -->
+  <ellipse cx="150" cy="190" rx="146" ry="186" fill="none" stroke="var(--logo-main)" stroke-width="3" />
+  <ellipse cx="150" cy="190" rx="138" ry="178" fill="none" stroke="var(--color-cerulean)" stroke-width="1.5" />
+  <ellipse cx="150" cy="190" rx="102" ry="142" fill="none" stroke="var(--logo-main)" stroke-width="1.5" />
+
+  <!-- type -->
+  <text class="seal-name" fill="var(--logo-main)">
+    <textPath href={`#${id}-top`} startOffset="50%" text-anchor="middle" dominant-baseline="central">MONASTERIE</textPath>
+  </text>
+  <text class="seal-motto" fill="var(--logo-main)">
+    <textPath href={`#${id}-bottom`} startOffset="50%" text-anchor="middle" dominant-baseline="central">CONVERSATIO MORUM</textPath>
+  </text>
+
+  <!-- side marks between the two lines -->
+  <path d="M 30 182 L 34 190 L 30 198 L 26 190 Z" fill="var(--logo-main)" />
+  <path d="M 270 182 L 274 190 L 270 198 L 266 190 Z" fill="var(--logo-main)" />
+
+  <!-- window and star -->
+  <g transform="translate(150 192) scale(0.66) translate(-128 -137)">
+    {icon.parts.map((p) => <path d={p.d} fill={p.star ? 'var(--logo-star)' : 'var(--logo-main)'} />)}
+  </g>
+</svg>
+
+<style>
+  .seal {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .seal-name {
+    font-family: var(--font-wordmark);
+    font-size: 23px;
+    letter-spacing: 0.16em;
+  }
+  .seal-motto {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.24em;
+  }
+</style>

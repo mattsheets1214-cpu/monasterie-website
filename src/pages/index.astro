@@ -1,62 +1,442 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import Seal from '../components/Seal.astro';
 import Logo from '../components/Logo.astro';
+import { branches } from '../data/branches';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/* ---- Web geometry ---------------------------------------------------------
+   Everything is laid out in a 1000 x 560 box. The SVG uses it as its viewBox
+   and the HTML nodes use the same numbers as percentages, so lines and nodes
+   always meet, at any screen size.                                        */
+const W = 1000;
+const H = 560;
+const C = { x: W / 2, y: H / 2 };
+
+// Seal: 62% of the box tall, artwork is 300 x 380 with its oval at rx 146, ry 186
+const SEAL_H = H * 0.6;
+const sealScale = SEAL_H / 380;
+const SEAL_W = 300 * sealScale;
+const sealRx = 146 * sealScale;
+const sealRy = 186 * sealScale;
+
+const NODE_D = 96; // medallion diameter
+// Where node centres sit: an oval around the seal. x is kept to 370 so a
+// node's label (max 11rem wide) stays inside the box down to 768px screens.
+const ORBIT = { x: 370, y: 210 };
+const GAP = 12; // space between a line's end and what it touches
+
+const nodes = branches.map((b, i) => {
+  const deg = b.angle ?? (i * 360) / branches.length;
+  const a = (deg * Math.PI) / 180;
+  const nx = C.x + ORBIT.x * Math.cos(a);
+  const ny = C.y + ORBIT.y * Math.sin(a);
+
+  // start on the seal's outer ring, aimed at the node
+  const sx = C.x + (sealRx + GAP) * Math.cos(a);
+  const sy = C.y + (sealRy + GAP) * Math.sin(a);
+  // end just short of the medallion
+  const dx = nx - sx;
+  const dy = ny - sy;
+  const len = Math.hypot(dx, dy);
+  const ex = nx - (dx / len) * (NODE_D / 2 + GAP);
+  const ey = ny - (dy / len) * (NODE_D / 2 + GAP);
+  // a slight bow, like a line drawn by hand
+  const bow = 0.1 * len;
+  const qx = (sx + ex) / 2 + (dy / len) * bow;
+  const qy = (sy + ey) / 2 - (dx / len) * bow;
+
+  return {
+    ...b,
+    i,
+    href: `${base}/${b.href}`,
+    left: (nx / W) * 100,
+    top: (ny / H) * 100,
+    // labels sit under the node, or above it for branches pointing up
+    labelAbove: Math.sin(a) < -0.5,
+    d: `M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${qx.toFixed(1)} ${qy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+  };
+});
 ---
 
-<BaseLayout>
-  <main id="main" class="hero">
-    <div class="wrap">
-      <Logo variant="icon" height="clamp(7rem, 14vw, 10rem)" decorative class="hero-icon" />
-      <h1 class="hero-name">
-        <Logo variant="wordmark" width="min(100%, 40rem)" />
-      </h1>
-      <p class="motto">Conversatio Morum</p>
-      <hr />
-      <p class="lede">
-        We design watches, from the timeless to the futuristic, in the spirit of
-        the monks who improved the human experience.
-      </p>
-      <p class="label muted soon">Site under construction</p>
-    </div>
+<BaseLayout ground="parchment">
+  <TopBar />
+  <main id="main">
+    <section class="web" aria-labelledby="web-title">
+      <!-- Wide screens: the seal with branches drawn out to nodes -->
+      <div class="web-stage" style={`--seal-w:${(SEAL_W / W) * 100}%; --node-d:${(NODE_D / W) * 100}%;`}>
+        <svg class="web-lines" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+          {nodes.map((n) => (
+            <g class="branch-line" data-branch={n.i} style={`--i:${n.i}`}>
+              <path class="line-casing" d={n.d} pathLength="1" />
+              <path class="line-light" d={n.d} pathLength="1" />
+              <path class="line-ink" d={n.d} pathLength="1" />
+            </g>
+          ))}
+        </svg>
+
+        <div class="web-seal">
+          <Seal />
+        </div>
+
+        <ul class="web-nodes" role="list" aria-label="Branches">
+          {nodes.map((n) => (
+            <li
+              class:list={['node', { 'label-above': n.labelAbove }]}
+              style={`left:${n.left}%; top:${n.top}%; --i:${n.i}`}
+            >
+              <a class="node-link" href={n.href} data-branch={n.i}>
+                <span class="node-disc" data-ground="plum">
+                  <Logo variant={n.icon} decorative height="70%" />
+                </span>
+                <span class="node-label">
+                  <span class="node-title">{n.title}</span>
+                  <span class="node-blurb">{n.blurb}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Phones: the seal on top, a plain list below -->
+      <Seal class="phone-seal" decorative />
+
+      <div class="web-intro">
+        <h1 id="web-title">A workshop for designing watches</h1>
+        <p class="muted">From the timeless to the futuristic.</p>
+      </div>
+
+      <nav class="phone-nav" aria-label="Branches">
+        <ul class="phone-list" role="list">
+          {nodes.map((n) => (
+            <li>
+              <a class="phone-item" href={n.href}>
+                <span class="phone-disc" data-ground="plum">
+                  <Logo variant={n.icon} decorative height="64%" />
+                </span>
+                <span>
+                  <span class="phone-title">{n.title}</span>
+                  <span class="phone-blurb">{n.blurb}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
   </main>
 </BaseLayout>
 
 <style>
-  .hero {
-    min-height: 100svh;
-    display: flex;
-    align-items: center;
+  /* ---- Section: fills the screen under the top bar ---------------------- */
+  .web {
+    height: calc(100svh - var(--bar-h));
+    min-height: 34rem;
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: center;
+    justify-items: center;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--grid-margin) var(--space-6);
+  }
+
+  .web-intro {
     text-align: center;
-    padding-block: var(--space-9);
   }
-  .hero .wrap > * {
-    margin-inline: auto;
+  .web-intro h1 {
+    font-size: var(--text-h3);
+    margin-bottom: var(--space-1);
   }
-  .hero :global(.hero-icon) {
+  .web-intro p {
+    margin: 0 auto;
+  }
+
+  /* ---- Stage ---------------------------------------------------------------- */
+  .web-stage {
+    position: relative;
+    /* as wide as fits, but never taller than the space left on screen */
+    width: min(100%, 68rem, calc((100svh - var(--bar-h) - 12rem) * 1000 / 560));
+    aspect-ratio: 1000 / 560;
+  }
+  .web-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .web-seal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--seal-w);
+    translate: -50% -50%;
+  }
+  .web-seal :global(.seal) {
+    width: 100%;
+  }
+
+  /* Lines: an ink line, with a lit version (popcorn on a plum casing,
+     because popcorn alone vanishes on parchment) faded in on hover. */
+  .branch-line path {
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    vector-effect: non-scaling-stroke;
+  }
+  .line-ink {
+    stroke: var(--color-ink);
+    stroke-width: 1.5;
+    transition: opacity var(--dur-base) ease;
+  }
+  .line-casing {
+    stroke: var(--color-plum);
+    stroke-width: 6;
+  }
+  .line-light {
+    stroke: var(--color-popcorn);
+    stroke-width: 2.5;
+  }
+  .line-casing,
+  .line-light {
+    opacity: 0;
+    transition: opacity var(--dur-base) ease;
+  }
+  .branch-line.is-lit .line-casing,
+  .branch-line.is-lit .line-light {
+    opacity: 1;
+  }
+  .branch-line.is-lit .line-ink {
+    opacity: 0;
+  }
+
+  /* ---- Nodes ------------------------------------------------------------- */
+  .web-nodes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .node {
+    position: absolute;
+    width: var(--node-d);
+    aspect-ratio: 1;
+    translate: -50% -50%;
+  }
+  .node-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    border-radius: 50%;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  .node-disc {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 transparent;
+    transition: box-shadow var(--dur-base) var(--ease-out);
+  }
+  .node-disc :global(.logo) {
     width: auto;
-    margin-inline: auto;
-    margin-bottom: var(--space-7);
   }
-  .hero-name {
-    margin-bottom: 0;
+  .node-label {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--space-3));
+    translate: -50% 0;
+    width: max-content;
+    max-width: 11rem;
+    text-align: center;
   }
-  .hero-name :global(.logo) {
-    margin-inline: auto;
+  .label-above .node-label {
+    top: auto;
+    bottom: calc(100% + var(--space-3));
   }
-  .motto {
+  .node-title {
+    display: block;
     font-family: var(--font-heading);
-    font-style: italic;
+    font-weight: var(--weight-heading);
     font-size: var(--text-h4);
-    margin-top: var(--space-6);
+    line-height: var(--leading-h4);
+    color: var(--heading);
   }
-  hr {
-    width: var(--space-7);
-    margin: var(--space-6) auto;
+  .node-blurb {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+    color: var(--text-muted);
   }
-  .lede {
-    max-width: 34rem;
+
+  @media (hover: hover) and (pointer: fine) {
+    .node-link:hover {
+      transform: translateY(-2px);
+    }
+    .node-link:hover .node-disc {
+      box-shadow: 0 6px 16px -8px rgb(28 19 20 / 0.45);
+    }
   }
-  .soon {
-    margin-top: var(--space-7);
+  .node-link:focus-visible {
+    outline: none;
+  }
+  .node-link:focus-visible .node-disc {
+    outline: var(--focus-width) solid var(--color-ink);
+    outline-offset: var(--focus-offset);
+  }
+  .node-link:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: var(--dur-fast);
+  }
+
+  /* ---- Entrance: once, on load ----------------------------------------------
+     seal settles, then each line draws out, then its node arrives.          */
+  @keyframes seal-in {
+    from { opacity: 0; scale: 0.97; }
+  }
+  @keyframes draw {
+    from { stroke-dashoffset: 1; }
+  }
+  @keyframes node-in {
+    from { opacity: 0; transform: translateY(6px) scale(0.96); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+  }
+
+  .web-seal {
+    animation: seal-in 600ms var(--ease-out) both;
+  }
+  .branch-line path {
+    animation: draw 900ms var(--ease-in-out) both;
+    animation-delay: calc(350ms + var(--i) * 140ms);
+  }
+  .node {
+    animation: node-in 420ms var(--ease-out) both;
+    animation-delay: calc(1050ms + var(--i) * 140ms);
+  }
+  .web-intro {
+    animation: fade-in 500ms ease both;
+    animation-delay: 200ms;
+  }
+
+  /* Reduced motion: no drawing or moving; things just appear, gently. */
+  @media (prefers-reduced-motion: reduce) {
+    .web-seal,
+    .web-intro {
+      animation: fade-in 200ms ease both;
+    }
+    .branch-line path {
+      animation: none;
+    }
+    .node {
+      animation: fade-in 200ms ease both;
+    }
+    .node-link,
+    .node-link:hover,
+    .node-link:active {
+      transform: none;
+    }
+  }
+
+  /* ---- Phones -------------------------------------------------------------- */
+  .web :global(.phone-seal),
+  .phone-nav {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .web {
+      display: block;
+      height: auto;
+      min-height: calc(100svh - var(--bar-h));
+      padding-top: var(--space-6);
+    }
+    .web-stage {
+      display: none;
+    }
+    .web :global(.phone-seal) {
+      display: block;
+      width: min(58vw, 15rem);
+      margin: 0 auto var(--space-5);
+      animation: seal-in 500ms var(--ease-out) both;
+    }
+    .web-intro {
+      margin-bottom: var(--space-6);
+    }
+    .phone-nav {
+      display: block;
+    }
+    .phone-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: var(--border-width) solid color-mix(in srgb, var(--color-plum) 18%, transparent);
+    }
+    .phone-list li {
+      border-bottom: var(--border-width) solid color-mix(in srgb, var(--color-plum) 18%, transparent);
+    }
+    .phone-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      min-height: 4.5rem;
+      padding-block: var(--space-3);
+      text-decoration: none;
+    }
+    .phone-item:active {
+      background: color-mix(in srgb, var(--color-plum) 6%, transparent);
+    }
+    .phone-disc {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+    }
+    .phone-disc :global(.logo) {
+      width: auto;
+    }
+    .phone-title {
+      display: block;
+      font-family: var(--font-heading);
+      font-weight: var(--weight-heading);
+      font-size: var(--text-h4);
+      line-height: var(--leading-h4);
+      color: var(--heading);
+    }
+    .phone-blurb {
+      display: block;
+      font-size: var(--text-small);
+      line-height: var(--leading-small);
+      color: var(--text-muted);
+    }
+  }
+
+  @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
+    .web :global(.phone-seal) {
+      animation: fade-in 200ms ease both;
+    }
   }
 </style>
+
+<script>
+  // Light a branch's line while its node is hovered or focused.
+  document.querySelectorAll<HTMLAnchorElement>('.node-link').forEach((link) => {
+    const line = document.querySelector(`.branch-line[data-branch="${link.dataset.branch}"]`);
+    if (!line) return;
+    const on = () => line.classList.add('is-lit');
+    const off = () => line.classList.remove('is-lit');
+    link.addEventListener('pointerenter', on);
+    link.addEventListener('pointerleave', off);
+    link.addEventListener('focus', on);
+    link.addEventListener('blur', off);
+  });
+</script>

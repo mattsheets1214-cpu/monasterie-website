@@ -63,6 +63,22 @@ monasterie-website/
 └── tsconfig.json           # TypeScript settings for editor support
 ```
 
+## Homepage web: adding a branch
+
+The homepage is the seal with branches drawn out to nodes; on phones it becomes the seal with a plain list. The branches, and the links in the top menu bar, all come from one file: `src/data/branches.ts`. To add one, add an entry:
+
+```ts
+{
+  title: 'Engineering',
+  href: 'engineering/',          // the page it opens (create src/pages/engineering.astro)
+  blurb: 'Cases, movements and how we build them.',
+  icon: 'icon',
+  // angle: 180,                 // optional: 0 right, 90 down, 180 left, 270 up
+},
+```
+
+Branches spread evenly around the seal unless you set `angle`. The seal itself lives in `src/components/Seal.astro`, so the finished seal artwork can replace it there.
+
 ## Design tokens and the style guide
 
 All brand values live in `src/styles/tokens.css`: change one there and the whole site follows. Build with the tokens instead of typing raw values:

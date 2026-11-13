@@ -17,6 +17,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* keep focused and linked-to content clear of the sticky top bar */
+  scroll-padding-top: calc(var(--bar-h) + var(--space-4));
 }
 
 body {

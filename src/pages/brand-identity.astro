@@ -1,0 +1,243 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import Logo from '../components/Logo.astro';
+import Seal from '../components/Seal.astro';
+
+const colours = [
+  { key: 'plum', name: 'Chocolate plum', role: 'Our main ground. Most things sit on it.' },
+  { key: 'parchment', name: 'Parchment', role: 'The light ground, and text and marks on plum.' },
+  { key: 'ink', name: 'Ink', role: 'Reading text and one-colour marks.' },
+  { key: 'cerulean', name: 'Cerulean', role: 'Rules, seals and flourishes. Never text.' },
+  { key: 'popcorn', name: 'Popcorn', role: "The light in the bell tower's window. Nothing else." },
+];
+---
+
+<BaseLayout
+  title="Brand identity · Monasterie Watch Company"
+  description="The Monasterie name, the bell tower and star, our colours and our type."
+  ground="parchment"
+>
+  <TopBar />
+  <main id="main">
+    <section class="bi-intro">
+      <div class="wrap bi-intro-grid">
+        <div>
+          <p class="label muted">Brand identity</p>
+          <h1>The Monasterie name, mark and colours</h1>
+          <p class="lede">
+            We design watches, from the timeless to the futuristic, in the spirit of the monks
+            who improved the human experience.
+          </p>
+        </div>
+        <Seal class="bi-seal" />
+      </div>
+    </section>
+
+    <section class="bi-section" aria-labelledby="story">
+      <div class="wrap bi-story">
+        <h2 id="story">Why a bell tower</h2>
+        <div class="bi-story-text">
+          <p>
+            For centuries, the tallest building in town was the bell tower. Before there were
+            clocks in homes or watches on wrists, people looked up to it to know the hour, and
+            its bells marked time for the whole community from first light to nightfall.
+          </p>
+          <p>
+            The people who rang those bells were monks, and the monastery was far more than a
+            place of prayer. It was the workshop and research lab of its time, where people
+            advanced farming, built water mills, preserved knowledge, and helped push early
+            mechanical clockmaking forward just to keep the hours on time.
+          </p>
+          <p>
+            Each monk took a vow called <em>conversatio morum</em>, a promise to keep changing for
+            the better every day of his life. It was never a promise to be perfect, only a
+            promise to keep working at it.
+          </p>
+          <p>
+            We aren't a religious company. We honor who those monks were as people: inventive,
+            disciplined, hardworking, rooted in their community, and always trying to become
+            better than they were the day before. Monasterie, an old English spelling of
+            monastery, is our version of that place.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bi-section bi-marks" data-ground="plum" aria-labelledby="marks">
+      <div class="wrap">
+        <h2 id="marks">Our marks</h2>
+        <p class="muted">
+          The window and star is the bell tower's window with its light on. The wordmark is
+          set in Metamorphous, always in capitals.
+        </p>
+        <div class="bi-marks-row">
+          <Logo variant="icon" height="11rem" />
+          <Logo variant="wordmark" width="min(100%, 32rem)" />
+        </div>
+        <div class="bi-marks-row">
+          <Logo variant="wordmark-star" width="min(100%, 22rem)" />
+        </div>
+      </div>
+    </section>
+
+    <section class="bi-section" aria-labelledby="colours">
+      <div class="wrap">
+        <h2 id="colours">Our colours</h2>
+        <p class="muted">Five colours, each with one job.</p>
+        <ul class="bi-swatches" role="list">
+          {colours.map((c) => (
+            <li class="bi-swatch">
+              <span class="bi-chip" style={`background: var(--color-${c.key})`}></span>
+              <span class="bi-swatch-name">{c.name}</span>
+              <span class="small muted">{c.role}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="bi-section" aria-labelledby="type">
+      <div class="wrap">
+        <h2 id="type">Our type</h2>
+        <div class="bi-type">
+          <div>
+            <p class="label muted">The name</p>
+            <p class="wordmark bi-type-sample">Monasterie</p>
+            <p class="small muted">Metamorphous, for the name only.</p>
+          </div>
+          <div>
+            <p class="label muted">Headings</p>
+            <p class="h2 bi-type-sample">Keep the hours with care</p>
+            <p class="small muted">Cormorant Garamond.</p>
+          </div>
+          <div>
+            <p class="label muted">Reading</p>
+            <p class="bi-type-sample">Every watch we make is built to keep your hours with care.</p>
+            <p class="small muted">Source Serif 4.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bi-footer">
+    <div class="wrap">
+      <p class="small muted">Monasterie Watch Company · Conversatio Morum</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .bi-intro {
+    padding-block: var(--space-8) var(--space-8);
+  }
+  .bi-intro-grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+  }
+  .bi-intro h1 {
+    margin-top: var(--space-3);
+    max-width: 14ch;
+  }
+  .lede {
+    font-size: var(--text-h4);
+    line-height: 1.5;
+  }
+  .bi-intro :global(.bi-seal) {
+    width: min(60vw, 17rem);
+    justify-self: center;
+  }
+  @media (min-width: 768px) {
+    .bi-intro-grid {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+
+  .bi-section {
+    padding-block: var(--space-9);
+    border-top: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+  }
+  .bi-section[data-ground='plum'] {
+    border-top: 0;
+  }
+
+  .bi-story {
+    display: grid;
+    gap: var(--space-5);
+  }
+  @media (min-width: 1024px) {
+    .bi-story {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  .bi-marks-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-8);
+    margin-top: var(--space-7);
+  }
+  .bi-marks-row :global(.logo-icon) {
+    width: auto;
+  }
+
+  .bi-swatches {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 0;
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 768px) {
+    .bi-swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .bi-swatches { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  .bi-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .bi-chip {
+    display: block;
+    height: 6rem;
+    border-radius: var(--radius);
+    border: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+    margin-bottom: var(--space-2);
+  }
+  .bi-swatch-name {
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: var(--text-h4);
+    color: var(--heading);
+  }
+
+  .bi-type {
+    display: grid;
+    gap: var(--space-7);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 1024px) {
+    .bi-type {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: end;
+    }
+  }
+  .bi-type-sample {
+    margin: var(--space-2) 0;
+  }
+  .bi-type .wordmark {
+    font-size: var(--text-h2);
+    color: var(--heading);
+  }
+
+  .bi-footer {
+    padding-block: var(--space-7);
+    border-top: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+  }
+</style>
