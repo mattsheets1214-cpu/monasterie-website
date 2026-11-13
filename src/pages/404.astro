@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+import Logo from '../components/Logo.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout
+  title="Page not found | Monasterie Watch Company"
+  description="This page doesn't exist. Head back to the Monasterie homepage."
+  ground="parchment"
+  noindex
+>
+  <TopBar />
+  <main id="main" class="nf">
+    <div class="wrap nf-inner">
+      <Logo variant="icon" height="7rem" decorative />
+      <h1>Page not found</h1>
+      <p class="muted">The page you're looking for isn't here.</p>
+      <a class="btn btn-primary" href={`${base}/`}>Go to the homepage</a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .nf {
+    min-height: calc(100svh - var(--bar-h));
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+  .nf-inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+  }
+  .nf-inner :global(.logo) {
+    width: auto;
+    margin-bottom: var(--space-4);
+  }
+  h1,
+  p {
+    margin: 0;
+  }
+  .btn {
+    margin-top: var(--space-4);
+  }
+</style>

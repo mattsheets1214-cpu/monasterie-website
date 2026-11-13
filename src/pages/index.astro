@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
 import Logo from '../components/Logo.astro';
 import { branches } from '../data/branches';
+import { organization, website } from '../data/site';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -102,7 +103,10 @@ const center = {
 };
 ---
 
-<BaseLayout ground="parchment">
+<BaseLayout
+  ground="parchment"
+  jsonLd={{ '@context': 'https://schema.org', '@graph': [organization, website] }}
+>
   <TopBar />
   <main id="main">
     <section class="web" aria-labelledby="web-title">

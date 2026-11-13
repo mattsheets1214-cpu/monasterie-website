@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
 import Logo from '../components/Logo.astro';
 import Seal from '../components/Seal.astro';
+import { organization, SITE_URL } from '../data/site';
 
 /* STAND-IN PHOTOS from Unsplash (free under the Unsplash License).
    REPLACE WITH MY OWN: put your photos in public/images/ and change `src`
@@ -66,9 +67,25 @@ const principles = [
 ---
 
 <BaseLayout
-  title="Brand identity · Monasterie Watch Company"
+  title="Brand Identity | Monasterie Watch Company"
   description="Why our logo is a bell tower, what the monks who rang those bells built, what Conversatio Morum means to us, and who started Monasterie."
+  image="og-brand-identity.png"
+  imageAlt="The Monasterie seal beside the words Brand Identity."
   ground="parchment"
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@graph': [
+      organization,
+      {
+        '@type': 'AboutPage',
+        '@id': `${SITE_URL}brand-identity/#page`,
+        url: `${SITE_URL}brand-identity/`,
+        name: 'Brand Identity | Monasterie Watch Company',
+        about: { '@id': organization['@id'] },
+        isPartOf: { '@id': `${SITE_URL}#website` },
+      },
+    ],
+  }}
 >
   <TopBar />
   <main id="main">
