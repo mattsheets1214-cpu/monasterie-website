@@ -1,0 +1,13 @@
+{
+  "name": "Monasterie Watch Company",
+  "short_name": "Monasterie",
+  "start_url": "/monasterie-website/",
+  "scope": "/monasterie-website/",
+  "display": "browser",
+  "background_color": "#3C2D2E",
+  "theme_color": "#3C2D2E",
+  "icons": [
+    { "src": "brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "brand/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

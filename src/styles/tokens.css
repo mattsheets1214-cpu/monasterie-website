@@ -112,6 +112,8 @@
   --focus: var(--color-parchment);
   --btn-bg: var(--color-parchment);
   --btn-text: var(--color-plum);
+  --logo-main: var(--color-parchment);
+  --logo-star: var(--color-popcorn);
 }
 
 [data-ground='parchment'] {
@@ -123,4 +125,7 @@
   --focus: var(--color-ink);
   --btn-bg: var(--color-plum);
   --btn-text: var(--color-parchment);
+  /* popcorn is invisible on parchment (1.2:1), so the logo goes one-colour */
+  --logo-main: var(--color-plum);
+  --logo-star: var(--color-plum);
 }

@@ -5,7 +5,7 @@
  * so it always shows what the site actually uses.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BellTower from '../components/BellTower.astro';
+import Logo from '../components/Logo.astro';
 
 const colours = [
   { key: 'plum', name: 'Chocolate plum', role: 'Primary ground. Most things sit on it.', text: 'parchment' },
@@ -39,6 +39,15 @@ const type = [
   { cls: 'label', label: 'Label', font: 'Source Serif 4 600, capitals', size: '13', sample: 'Watch Company' },
 ];
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const logoFiles = [
+  { name: 'Icon', file: 'monasterie-icon', min: '32px tall' },
+  { name: 'Wordmark with Watch Company', file: 'monasterie-wordmark', min: '400px wide' },
+  { name: 'Wordmark, star A', file: 'monasterie-wordmark-star', min: '200px wide' },
+  { name: 'Wordmark, name only', file: 'monasterie-wordmark-name', min: '120px wide' },
+];
+
 const spaces = [
   [1, 4], [2, 8], [3, 12], [4, 16], [5, 24], [6, 32], [7, 48], [8, 64], [9, 96], [10, 128],
 ];
@@ -48,8 +57,7 @@ const spaces = [
   <header class="sg-header">
     <div class="wrap">
       <div class="sg-brand">
-        <BellTower size={28} />
-        <p class="wordmark sg-wordmark">Monasterie</p>
+        <Logo variant="wordmark-star" width="min(15rem, 70vw)" />
       </div>
       <h1>Style guide</h1>
       <p class="muted">
@@ -58,6 +66,7 @@ const spaces = [
         and is hidden from search engines.
       </p>
       <nav class="sg-nav" aria-label="Style guide sections">
+        <a class="btn btn-secondary btn-sm" href="#logo">Logo</a>
         <a class="btn btn-secondary btn-sm" href="#colours">Colours</a>
         <a class="btn btn-secondary btn-sm" href="#type">Type</a>
         <a class="btn btn-secondary btn-sm" href="#buttons">Buttons</a>
@@ -68,6 +77,75 @@ const spaces = [
   </header>
 
   <main id="main">
+    <!-- ================= Logo ================= -->
+    <section id="logo" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Logo</h2>
+        <p class="muted">
+          On plum the logo is parchment with a popcorn star. On parchment it goes all plum,
+          because popcorn on parchment is almost invisible (1.2:1). The
+          site's {' '}<code>&lt;Logo&gt;</code> component switches automatically.
+        </p>
+      </div>
+
+      {(['plum', 'parchment'] as const).map((g) => (
+        <div class="logo-panel" data-ground={g}>
+          <div class="wrap">
+            <p class="label muted">On {g}</p>
+            <div class="logo-row">
+              <Logo variant="icon" height="9rem" />
+              <Logo variant="wordmark" width="min(100%, 30rem)" />
+            </div>
+            <div class="logo-row">
+              <Logo variant="wordmark-star" width="min(100%, 20rem)" />
+              <Logo variant="wordmark-name" width="min(100%, 14rem)" />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div class="wrap">
+        <h3 class="sg-sub">Small sizes</h3>
+        <p class="muted small">
+          Below 32px the full icon blurs, so browser tabs use a small-size cut: heavier arch,
+          shorter rays, slightly fuller star, on a plum tile. These are shown at true size.
+        </p>
+        <div class="small-row" data-ground="plum">
+          <figure><img src={`${base}/favicon.svg`} width="16" height="16" alt="" /><figcaption class="label">16 tab</figcaption></figure>
+          <figure><img src={`${base}/favicon.svg`} width="32" height="32" alt="" /><figcaption class="label">32 tab</figcaption></figure>
+          <figure><Logo variant="icon" height="32px" decorative /><figcaption class="label">32 icon</figcaption></figure>
+          <figure><Logo variant="icon" height="48px" decorative /><figcaption class="label">48 icon</figcaption></figure>
+          <figure><img src={`${base}/apple-touch-icon.png`} width="60" height="60" alt="" class="app-icon" /><figcaption class="label">Home screen</figcaption></figure>
+        </div>
+
+        <h3 class="sg-sub">Files and minimum sizes</h3>
+        <div class="table-scroll">
+          <table class="spec small">
+            <thead>
+              <tr><th scope="col">Mark</th><th scope="col">Smallest</th><th scope="col">Download</th></tr>
+            </thead>
+            <tbody>
+              {logoFiles.map((f) => (
+                <tr>
+                  <td>{f.name}</td>
+                  <td>{f.min}</td>
+                  <td class="dl">
+                    <a href={`${base}/brand/${f.file}-on-plum.svg`} download>For plum</a>
+                    <a href={`${base}/brand/${f.file}-on-parchment.svg`} download>For parchment</a>
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td>Share image</td>
+                <td>1200 × 630</td>
+                <td class="dl"><a href={`${base}/og-image.png`} download>PNG</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ================= Colours ================= -->
     <section id="colours" class="sg-section" data-ground="parchment">
       <div class="wrap">
@@ -299,9 +377,47 @@ const spaces = [
     gap: var(--space-3);
     margin-bottom: var(--space-7);
   }
-  .sg-wordmark {
-    font-size: var(--text-h4);
-    padding-top: 0.15em;
+  /* Logo */
+  .logo-panel {
+    padding-block: var(--space-7);
+    margin-block: var(--space-5);
+  }
+  .logo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-7);
+    margin-top: var(--space-5);
+  }
+  .logo-row :global(.logo-icon) {
+    width: auto;
+  }
+  .small-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-6);
+    padding: var(--space-5);
+    margin-top: var(--space-4);
+    border-radius: var(--radius);
+  }
+  .small-row figure {
+    margin: 0;
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2);
+  }
+  .small-row figcaption {
+    color: var(--text-muted);
+  }
+  .small-row :global(.logo-icon) {
+    width: auto;
+  }
+  .app-icon {
+    border-radius: 13px;
+  }
+  .dl a + a {
+    margin-left: var(--space-4);
   }
   .sg-nav {
     display: flex;

@@ -1,14 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import BellTower from '../components/BellTower.astro';
+import Logo from '../components/Logo.astro';
 ---
 
 <BaseLayout>
   <main id="main" class="hero">
     <div class="wrap">
-      <div class="mark"><BellTower size={56} /></div>
-      <h1 class="wordmark">Monasterie</h1>
-      <p class="label muted sub">Watch Company</p>
+      <Logo variant="icon" height="clamp(7rem, 14vw, 10rem)" decorative class="hero-icon" />
+      <h1 class="hero-name">
+        <Logo variant="wordmark" width="min(100%, 40rem)" />
+      </h1>
       <p class="motto">Conversatio Morum</p>
       <hr />
       <p class="lede">
@@ -31,16 +32,16 @@ import BellTower from '../components/BellTower.astro';
   .hero .wrap > * {
     margin-inline: auto;
   }
-  .mark {
-    color: var(--text);
-    width: max-content;
-    margin-bottom: var(--space-6);
+  .hero :global(.hero-icon) {
+    width: auto;
+    margin-inline: auto;
+    margin-bottom: var(--space-7);
   }
-  .wordmark {
-    padding-left: var(--tracking-wordmark); /* re-centre tracked capitals */
+  .hero-name {
+    margin-bottom: 0;
   }
-  .sub {
-    margin-top: var(--space-4);
+  .hero-name :global(.logo) {
+    margin-inline: auto;
   }
   .motto {
     font-family: var(--font-heading);

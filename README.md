@@ -45,10 +45,12 @@ monasterie-website/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml      # GitHub Actions: build + deploy to Pages on push to main
-├── public/                 # Static files copied as-is (favicon, images, PDFs)
-│   └── favicon.svg
+├── public/                 # Static files copied as-is
+│   ├── brand/              #   logo SVGs for each ground + app icons
+│   ├── favicon.svg / .ico  #   tab icon
+│   └── og-image.png        #   link-preview image
 ├── src/
-│   ├── components/         # Reusable pieces of UI (e.g. BellTower.astro logo)
+│   ├── components/         # Reusable pieces of UI (Logo.astro + logo-paths.ts)
 │   ├── layouts/            # Page shells: <head>, fonts, shared wrapper (BaseLayout.astro)
 │   ├── pages/              # Every file here becomes a URL
 │   │   ├── index.astro     #   → the homepage (/)
@@ -77,7 +79,31 @@ To check them, open `/monasterie-website/styleguide/`. It isn't linked from the 
 
 Fonts are self-hosted from npm (`@fontsource`), so there's no Google Fonts request.
 
-### Adding a new page
+## Logo
+
+Use the `Logo` component; it switches colours with the ground (parchment + popcorn star on plum, all plum on parchment, because popcorn disappears on light backgrounds):
+
+```astro
+---
+import Logo from '../components/Logo.astro';
+---
+<Logo variant="icon" height="8rem" />
+<Logo variant="wordmark" width="32rem" />       <!-- with WATCH COMPANY -->
+<Logo variant="wordmark-star" width="16rem" />  <!-- star in the A -->
+<Logo variant="wordmark-name" width="10rem" />  <!-- name only -->
+```
+
+Minimum sizes: icon 32px tall, wordmark 400px wide, star wordmark 200px, name-only 120px.
+
+| File | What it is |
+|---|---|
+| `public/brand/monasterie-*-on-plum.svg` / `-on-parchment.svg` | Clean SVGs of each mark for use outside the site |
+| `public/favicon.svg`, `favicon.ico` | Browser tab icon: a small-size cut with a heavier arch and fuller star, on a plum tile |
+| `public/apple-touch-icon.png`, `brand/icon-192.png`, `brand/icon-512.png` | Home-screen icons (full drawing on plum) |
+| `public/og-image.png` | 1200×630 share image for links on iMessage, social media, Slack |
+| `src/components/logo-paths.ts` | The logo paths the component draws |
+
+
 
 Create a file in `src/pages/`. The filename becomes the URL:
 

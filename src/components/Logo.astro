@@ -1,0 +1,52 @@
+---
+/**
+ * Monasterie logo, drawn inline so it picks up the ground it sits on:
+ * parchment + popcorn star on plum, all plum on parchment (popcorn
+ * disappears on light grounds). Colours come from --logo-main and
+ * --logo-star in tokens.css.
+ *
+ * Minimum sizes (below these, details close up):
+ *   icon           32px tall   (smaller: use /favicon.svg, the small-size cut)
+ *   wordmark       400px wide  (the WATCH COMPANY line needs the room)
+ *   wordmark-star  200px wide
+ *   wordmark-name  120px wide
+ */
+import { LOGOS, type LogoVariant } from './logo-paths';
+
+interface Props {
+  variant?: LogoVariant;
+  /** Set one of width/height (CSS length); the other follows the artwork. */
+  width?: string;
+  height?: string;
+  /** Hide from screen readers when the name is already written next to it. */
+  decorative?: boolean;
+  class?: string;
+}
+
+const { variant = 'icon', width, height, decorative = false, class: className } = Astro.props;
+const logo = LOGOS[variant];
+const style = [width && `width:${width}`, height && `height:${height}`].filter(Boolean).join(';');
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={logo.viewBox}
+  class:list={['logo', `logo-${variant}`, className]}
+  style={style || undefined}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : logo.label}
+  aria-hidden={decorative ? 'true' : undefined}
+  focusable="false"
+>
+  {!decorative && <title>{logo.label}</title>}
+  {logo.parts.map((p) => <path d={p.d} fill={p.star ? 'var(--logo-star)' : 'var(--logo-main)'} />)}
+</svg>
+
+<style>
+  .logo {
+    display: block;
+    height: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+</style>
