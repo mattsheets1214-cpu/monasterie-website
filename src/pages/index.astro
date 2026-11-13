@@ -22,7 +22,11 @@ const CENTER_H = (CENTER_W * 169) / 1205;
 const hw = CENTER_W / 2;
 const hh = CENTER_H / 2;
 
-const NODE_D = 96; // medallion diameter
+const NODE_D = 96; // height of a node's icon
+// The window-and-star icon is 226 x 278, so it is narrower than it is tall.
+// Lines stop just short of its outline, treated as an oval this size.
+const ICON_RX = (NODE_D / 2) * (226 / 278);
+const ICON_RY = NODE_D / 2;
 // Where node centers sit: an oval around the wordmark, far enough out that
 // each line has room to read as a line.
 const ORBIT = { x: hw + 260, y: 200 };
@@ -47,8 +51,11 @@ const nodes = branches.map((b, i) => {
   const dx = nx - sx;
   const dy = ny - sy;
   const len = Math.hypot(dx, dy);
-  const ex = nx - (dx / len) * (NODE_D / 2 + GAP);
-  const ey = ny - (dy / len) * (NODE_D / 2 + GAP);
+  const ux = dx / len;
+  const uy = dy / len;
+  const toEdge = 1 / Math.hypot(ux / ICON_RX, uy / ICON_RY);
+  const ex = nx - ux * (toEdge + GAP);
+  const ey = ny - uy * (toEdge + GAP);
   // a slight bow, like a line drawn by hand
   const bow = 0.1 * len;
   const qx = (sx + ex) / 2 + (dy / len) * bow;
@@ -149,8 +156,8 @@ const center = {
                 aria-labelledby={`node-${n.i}-title`}
                 aria-describedby={`node-${n.i}-blurb`}
               >
-                <span class="node-disc" data-ground="plum">
-                  <Logo variant={n.icon} decorative height="70%" />
+                <span class="node-disc">
+                  <Logo variant={n.icon} decorative height="100%" />
                 </span>
                 <span class="node-label">
                   <span class="node-title" id={`node-${n.i}-title`}>{n.title}</span>
@@ -177,8 +184,8 @@ const center = {
                 aria-labelledby={`phone-${n.i}-title`}
                 aria-describedby={`phone-${n.i}-blurb`}
               >
-                <span class="phone-disc" data-ground="plum">
-                  <Logo variant={n.icon} decorative height="64%" />
+                <span class="phone-disc">
+                  <Logo variant={n.icon} decorative height="100%" />
                 </span>
                 <span>
                   <span class="phone-title" id={`phone-${n.i}-title`}>{n.title}</span>
@@ -302,20 +309,24 @@ const center = {
     width: 100%;
     height: 100%;
     text-decoration: none;
-    border-radius: 50%;
+    border-radius: var(--radius);
     transition: transform var(--dur-base) var(--ease-out);
   }
+  /* The icon sits straight on the parchment (no disc), so it is all plum:
+     popcorn can't be seen on parchment. */
   .node-disc {
-    display: grid;
-    place-items: center;
+    position: relative;
+    display: block;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    box-shadow: 0 0 0 0 transparent;
-    transition: box-shadow var(--dur-base) var(--ease-out);
   }
+  /* pinned to the node's box so it is exactly as tall as the node */
   .node-disc :global(.logo) {
+    position: absolute;
+    inset: 0;
+    margin: auto;
     width: auto;
+    height: 100% !important;
   }
   .node-label {
     position: absolute;
@@ -350,9 +361,6 @@ const center = {
     .node-link:hover {
       transform: translateY(-2px);
     }
-    .node-link:hover .node-disc {
-      box-shadow: 0 6px 16px -8px rgb(28 19 20 / 0.45);
-    }
   }
   .node-link:focus-visible {
     outline: none;
@@ -360,6 +368,7 @@ const center = {
   .node-link:focus-visible .node-disc {
     outline: var(--focus-width) solid var(--color-ink);
     outline-offset: var(--focus-offset);
+    border-radius: var(--radius);
   }
   .node-link:active {
     transform: translateY(0) scale(0.98);
@@ -475,10 +484,10 @@ const center = {
       place-items: center;
       width: 3rem;
       height: 3rem;
-      border-radius: 50%;
     }
     .phone-disc :global(.logo) {
       width: auto;
+      height: 3rem !important;
     }
     .phone-title {
       display: block;
