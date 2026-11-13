@@ -7,12 +7,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Logo from '../components/Logo.astro';
 
-const colours = [
+const colors = [
   { key: 'plum', name: 'Chocolate plum', role: 'Primary ground. Most things sit on it.', text: 'parchment' },
   { key: 'parchment', name: 'Parchment', role: 'Light ground, and text and marks on plum.', text: 'ink' },
   { key: 'cerulean', name: 'Cerulean', role: 'Decorative only: rules, seals, flourishes. Never text.', text: 'ink' },
   { key: 'popcorn', name: 'Popcorn', role: "The beacon's light only. Never text, never a background.", text: 'ink' },
-  { key: 'ink', name: 'Ink', role: 'Reading text and one-colour marks.', text: 'parchment' },
+  { key: 'ink', name: 'Ink', role: 'Reading text and one-color marks.', text: 'parchment' },
 ];
 
 // Text-on-ground pairs to check. `allowed` is the house rule, separate from the maths.
@@ -61,13 +61,13 @@ const spaces = [
       </div>
       <h1>Style guide</h1>
       <p class="muted">
-        Every colour, type size, button and spacing step the site uses, read live
+        Every color, type size, button and spacing step the site uses, read live
         from <code>src/styles/tokens.css</code>. This page is not linked from the site
         and is hidden from search engines.
       </p>
       <nav class="sg-nav" aria-label="Style guide sections">
         <a class="btn btn-secondary btn-sm" href="#logo">Logo</a>
-        <a class="btn btn-secondary btn-sm" href="#colours">Colours</a>
+        <a class="btn btn-secondary btn-sm" href="#colors">Colors</a>
         <a class="btn btn-secondary btn-sm" href="#type">Type</a>
         <a class="btn btn-secondary btn-sm" href="#buttons">Buttons</a>
         <a class="btn btn-secondary btn-sm" href="#spacing">Spacing</a>
@@ -146,14 +146,14 @@ const spaces = [
       </div>
     </section>
 
-    <!-- ================= Colours ================= -->
-    <section id="colours" class="sg-section" data-ground="parchment">
+    <!-- ================= Colors ================= -->
+    <section id="colors" class="sg-section" data-ground="parchment">
       <div class="wrap">
-        <h2>Colours</h2>
-        <p class="muted">Five colours, each with one job. Tap a hex code to copy it.</p>
+        <h2>Colors</h2>
+        <p class="muted">Five colors, each with one job. Tap a hex code to copy it.</p>
 
         <ul class="swatches" role="list">
-          {colours.map((c) => (
+          {colors.map((c) => (
             <li class="swatch">
               <div
                 class="swatch-chip"
@@ -236,7 +236,7 @@ const spaces = [
           <p>
             A Cormorant heading sits over Source Serif 4 body copy. Body text keeps to about
             65 characters a line so it stays easy to read on a wide screen, and
-            <a href="#type">links are underlined</a> so they read as links without colour.
+            <a href="#type">links are underlined</a> so they read as links without color.
           </p>
         </div>
       </div>
@@ -440,7 +440,7 @@ const spaces = [
     font-size: 0.875em;
   }
 
-  /* Colours */
+  /* Colors */
   .swatches {
     list-style: none;
     padding: 0;

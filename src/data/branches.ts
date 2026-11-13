@@ -22,7 +22,7 @@ export const branches: Branch[] = [
   {
     title: 'Brand Identity',
     href: 'brand-identity/',
-    blurb: 'The name, the bell tower, our colours and type.',
+    blurb: 'The bell tower, the monks, our marks and our founder.',
     icon: 'icon',
   },
 ];

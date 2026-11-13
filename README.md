@@ -56,7 +56,7 @@ monasterie-website/
 │   │   ├── index.astro     #   → the homepage (/)
 │   │   └── styleguide.astro#   → hidden style guide (/styleguide), not linked, noindex
 │   └── styles/
-│       ├── tokens.css      # Design tokens: colours, fonts, type scale, spacing, radius, grid
+│       ├── tokens.css      # Design tokens: colors, fonts, type scale, spacing, radius, grid
 │       └── global.css      # Fonts, base styles, .wrap/.grid, headings, buttons
 ├── astro.config.mjs        # Astro settings (site URL + base path for GitHub Pages)
 ├── package.json            # Dependencies and npm scripts
@@ -83,7 +83,7 @@ Branches spread evenly around the seal unless you set `angle`. The seal itself l
 
 All brand values live in `src/styles/tokens.css`: change one there and the whole site follows. Build with the tokens instead of typing raw values:
 
-- **Colours:** `--color-plum`, `--color-parchment`, `--color-cerulean`, `--color-popcorn`, `--color-ink`. Cerulean and popcorn are never used for text.
+- **Colors:** `--color-plum`, `--color-parchment`, `--color-cerulean`, `--color-popcorn`, `--color-ink`. Cerulean and popcorn are never used for text.
 - **Grounds:** put `data-ground="plum"` (default) or `data-ground="parchment"` on a section, and use `var(--bg)`, `var(--text)`, `var(--heading)` and `var(--text-muted)` so components work on either ground.
 - **Type:** `.wordmark` (Metamorphous, the name only), `h1`–`h4` (Cormorant Garamond), body text (Source Serif 4), `.small`, `.label`.
 - **Spacing:** `--space-1` to `--space-10` (4, 8, 12, 16, 24, 32, 48, 64, 96, 128px).
@@ -97,7 +97,7 @@ Fonts are self-hosted from npm (`@fontsource`), so there's no Google Fonts reque
 
 ## Logo
 
-Use the `Logo` component; it switches colours with the ground (parchment + popcorn star on plum, all plum on parchment, because popcorn disappears on light backgrounds):
+Use the `Logo` component; it switches colors with the ground (parchment + popcorn star on plum, all plum on parchment, because popcorn disappears on light backgrounds):
 
 ```astro
 ---

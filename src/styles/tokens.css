@@ -1,20 +1,20 @@
 /* ==========================================================================
    Monasterie design tokens
-   One place for every colour, font, size, space, corner and grid value.
+   One place for every color, font, size, space, corner and grid value.
    Change a value here and the whole site (and /styleguide) follows.
    Source: Monasterie Brand Kit v1.0 (Nov 2026).
    ========================================================================== */
 
 :root {
-  /* ---- Brand colours (raw) -------------------------------------------- */
+  /* ---- Brand colors (raw) -------------------------------------------- */
   /* Each has one job. Popcorn and cerulean are never used for text.        */
   --color-plum: #3c2d2e;      /* Chocolate plum: primary ground             */
   --color-parchment: #f4efe7; /* Light ground; text and marks on plum       */
   --color-cerulean: #9bb7d4;  /* Decorative only: rules, seals, flourishes  */
   --color-popcorn: #f8de8d;   /* The beacon's light only                    */
-  --color-ink: #1c1314;       /* Reading text and one-colour marks          */
+  --color-ink: #1c1314;       /* Reading text and one-color marks          */
 
-  /* Muted text: 75% of the text colour over its ground, as solid values
+  /* Muted text: 75% of the text color over its ground, as solid values
      so they never shift. Both pass WCAG AA for body text (7:1+).          */
   --color-parchment-muted: #c6beb9; /* on plum, 7.1:1      */
   --color-ink-muted: #524a49;       /* on parchment, 7.5:1 */
@@ -105,7 +105,7 @@
 }
 
 /* ---- Grounds ---------------------------------------------------------------
-   Semantic colours change with the ground. Put data-ground="plum" or
+   Semantic colors change with the ground. Put data-ground="plum" or
    data-ground="parchment" on any section; components read only these.     */
 :root,
 [data-ground='plum'] {
@@ -130,7 +130,7 @@
   --focus: var(--color-ink);
   --btn-bg: var(--color-plum);
   --btn-text: var(--color-parchment);
-  /* popcorn is invisible on parchment (1.2:1), so the logo goes one-colour */
+  /* popcorn is invisible on parchment (1.2:1), so the logo goes one-color */
   --logo-main: var(--color-plum);
   --logo-star: var(--color-plum);
 }
