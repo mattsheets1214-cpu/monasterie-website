@@ -61,7 +61,7 @@ if (kind === 'category') {
   console.log(`
 ✓ Category "${name}" created as a draft.
   1. Fill in the TODOs in src/content/categories/${slug}.md
-  2. Preview: npm run dev, then open /monasterie-website/watches/${slug}/
+  2. Preview: npm run dev, then open /watches/${slug}/
   3. Publish: set draft: false, commit and push.
   Add watches with: npm run new -- watch "Watch name" --category ${slug}
 `);
@@ -79,7 +79,7 @@ if (kind === 'watch') {
   1. Put its photos in src/content/watches/${slug}/ and list them under photos:
   2. Fill in summary, status, price (when real) and the specs; delete rows you don't need.
   3. Write the story under the --- line.
-  4. Preview: npm run dev, then open /monasterie-website/watches/${category}/${slug}/
+  4. Preview: npm run dev, then open /watches/${category}/${slug}/
   5. Publish: set draft: false, commit and push.
 `);
 }
@@ -104,7 +104,7 @@ if (kind === 'branch') {
 ✓ Branch "${name}" created. It is live as soon as you push, so finish it first.
   1. Fill in the TODOs in src/pages/${slug}.astro
   2. Write its one-line blurb in src/data/branches.ts
-  3. Preview: npm run dev, then open /monasterie-website/${slug}/
+  3. Preview: npm run dev, then open /${slug}/
   4. Commit and push.
 `);
 }

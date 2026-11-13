@@ -97,7 +97,7 @@ Use a main branch for a section that isn't a watch category and needs its own la
 npm run dev
 ```
 
-Open the address it prints (usually http://localhost:4321/monasterie-website/). Pages update as you save. If a file has a mistake, such as a missing field, a misspelled category or a photo path that doesn't exist, the terminal and the browser both show which file and which line.
+Open the address it prints (usually http://localhost:4321/). Pages update as you save. If a file has a mistake, such as a missing field, a misspelled category or a photo path that doesn't exist, the terminal and the browser both show which file and which line.
 
 ## Editing on GitHub without a computer set up
 

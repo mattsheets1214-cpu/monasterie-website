@@ -4,7 +4,7 @@
 
 The website for Monasterie Watch Company, built with [Astro](https://astro.build) and deployed automatically to GitHub Pages.
 
-**Live site:** https://mattsheets1214-cpu.github.io/monasterie-website/
+**Live site:** https://monasteriewatches.github.io/
 
 ---
 
@@ -14,8 +14,8 @@ You need [Node.js](https://nodejs.org) 22 or newer (check with `node --version`)
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/mattsheets1214-cpu/monasterie-website.git
-cd monasterie-website
+git clone https://github.com/monasteriewatches/monasteriewatches.github.io.git
+cd monasteriewatches.github.io
 
 # 2. Install dependencies (first time only, or after package.json changes)
 npm install
@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Open the URL it prints (usually http://localhost:4321/monasterie-website/). The page reloads automatically as you edit files.
+Open the URL it prints (usually http://localhost:4321/). The page reloads automatically as you edit files.
 
 | Command           | What it does                                          |
 | ----------------- | ----------------------------------------------------- |
@@ -41,7 +41,7 @@ No manual steps: edit, commit, push to `main`, and the live site updates.
 ## How the folders are organized
 
 ```
-monasterie-website/
+monasteriewatches.github.io/
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml      # GitHub Actions: build + deploy to Pages on push to main
@@ -92,7 +92,7 @@ All brand values live in `src/styles/tokens.css`: change one there and the whole
 - **Grid:** `.wrap` for page edges, `.grid` for 4 / 8 / 12 columns (phone / 768px+ / 1024px+).
 - **Buttons:** `.btn` plus `.btn-primary`, `.btn-secondary` or `.btn-text`; add `.btn-sm` for the 44px size.
 
-To check them, open `/monasterie-website/styleguide/`. It isn't linked from the site and tells search engines not to index it, but anyone with the URL can open it.
+To check them, open `/styleguide/`. It isn't linked from the site and tells search engines not to index it, but anyone with the URL can open it.
 
 Fonts are self-hosted from npm (`@fontsource`), so there's no Google Fonts request.
 
@@ -124,8 +124,8 @@ Minimum sizes: icon 32px tall, wordmark 400px wide, star wordmark 200px, name-on
 
 Create a file in `src/pages/`. The filename becomes the URL:
 
-- `src/pages/about.astro` → `/monasterie-website/about`
-- `src/pages/watches/f1.astro` → `/monasterie-website/watches/f1`
+- `src/pages/about.astro` → `/about`
+- `src/pages/watches/f1.astro` → `/watches/f1`
 
 Wrap the content in `BaseLayout` so it gets the shared head and styles:
 
@@ -140,14 +140,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 ### Linking and images
 
-Because the site lives under `/monasterie-website/`, build internal links and asset paths with the base URL:
-
-```astro
-<a href={`${import.meta.env.BASE_URL}/about`}>About</a>
-```
+The site lives at the root of `monasteriewatches.github.io`, so links are plain paths like `/about` or `/watches/f1/`. The existing code builds them from `import.meta.env.BASE_URL`, which keeps working if the site ever moves under a sub-path again.
 
 Put images in `public/` (e.g. `public/images/eyelid.jpg`) to reference them by path, or in `src/assets/` to let Astro optimize them.
 
 ## Custom domain (later)
 
-To use a domain like `monasterie.com`: add it under **Settings → Pages → Custom domain**, then in `astro.config.mjs` set `site` to `https://monasterie.com` and delete the `base` line.
+To use a domain like `monasteriewatches.com`: add it under **Settings → Pages → Custom domain**, then set `site` in `astro.config.mjs` and `SITE` in `src/data/site.ts` to the new address.
