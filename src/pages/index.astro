@@ -1,7 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import TopBar from '../components/TopBar.astro';
-import Seal from '../components/Seal.astro';
 import Logo from '../components/Logo.astro';
 import { branches } from '../data/branches';
 
@@ -15,17 +14,16 @@ const W = 1000;
 const H = 560;
 const C = { x: W / 2, y: H / 2 };
 
-// Seal: 62% of the box tall, artwork is 300 x 380 with its oval at rx 146, ry 186
-const SEAL_H = H * 0.6;
-const sealScale = SEAL_H / 380;
-const SEAL_W = 300 * sealScale;
-const sealRx = 146 * sealScale;
-const sealRy = 186 * sealScale;
+// Centre: the star-A wordmark (artwork viewBox 1205 x 169)
+const CENTER_W = 520;
+const CENTER_H = (CENTER_W * 169) / 1205;
+const hw = CENTER_W / 2;
+const hh = CENTER_H / 2;
 
 const NODE_D = 96; // medallion diameter
-// Where node centers sit: an oval around the seal. x is kept to 370 so a
-// node's label (max 11rem wide) stays inside the box down to 768px screens.
-const ORBIT = { x: 370, y: 210 };
+// Where node centers sit: an oval around the wordmark, far enough out that
+// each line has room to read as a line.
+const ORBIT = { x: hw + 260, y: 200 };
 const GAP = 12; // space between a line's end and what it touches
 
 const nodes = branches.map((b, i) => {
@@ -34,9 +32,15 @@ const nodes = branches.map((b, i) => {
   const nx = C.x + ORBIT.x * Math.cos(a);
   const ny = C.y + ORBIT.y * Math.sin(a);
 
-  // start on the seal's outer ring, aimed at the node
-  const sx = C.x + (sealRx + GAP) * Math.cos(a);
-  const sy = C.y + (sealRy + GAP) * Math.sin(a);
+  // start just outside the wordmark's box, in the node's direction
+  const c = Math.cos(a);
+  const sn = Math.sin(a);
+  const t = Math.min(
+    Math.abs(c) > 1e-6 ? hw / Math.abs(c) : Infinity,
+    Math.abs(sn) > 1e-6 ? hh / Math.abs(sn) : Infinity
+  );
+  const sx = C.x + (t + GAP) * c;
+  const sy = C.y + (t + GAP) * sn;
   // end just short of the medallion
   const dx = nx - sx;
   const dy = ny - sy;
@@ -60,15 +64,15 @@ const nodes = branches.map((b, i) => {
   };
 });
 
-/* Fit the box to what is actually drawn (seal, nodes and their labels),
+/* Fit the box to what is actually drawn (wordmark, nodes and their labels),
    so the group is always centred and as large as the screen allows,
    however many branches there are. Labels are HTML, so their size is an
    allowance in box units: about 11rem wide and four lines tall. */
 const LABEL_HALF_W = 80;
 const LABEL_H = 130;
 const PAD = 20;
-const xs = [C.x - sealRx, C.x + sealRx];
-const ys = [C.y - sealRy, C.y + sealRy];
+const xs = [C.x - hw, C.x + hw];
+const ys = [C.y - hh, C.y + hh];
 for (const n of nodes) {
   const r = NODE_D / 2;
   xs.push(n.nx - Math.max(r, LABEL_HALF_W), n.nx + Math.max(r, LABEL_HALF_W));
@@ -91,10 +95,10 @@ const placed = nodes.map((n) => {
     d: `M ${fx(sx)} ${fy(sy)} Q ${fx(qx)} ${fy(qy)} ${fx(ex)} ${fy(ey)}`,
   };
 });
-const seal = {
+const center = {
   left: ((C.x - minX) / BW) * 100,
   top: ((C.y - minY) / BH) * 100,
-  w: (SEAL_W / BW) * 100,
+  w: (CENTER_W / BW) * 100,
 };
 ---
 
@@ -108,10 +112,10 @@ const seal = {
         <p class="muted">From the timeless to the futuristic.</p>
       </div>
 
-      <!-- Wide screens: the seal with branches drawn out to nodes -->
+      <!-- Wide screens: the wordmark with branches drawn out to nodes -->
       <div
         class="web-stage"
-        style={`--seal-w:${seal.w}%; --seal-x:${seal.left}%; --seal-y:${seal.top}%; --node-d:${(NODE_D / BW) * 100}%; --ratio:${BW / BH};`}
+        style={`--center-w:${center.w}%; --center-x:${center.left}%; --center-y:${center.top}%; --node-d:${(NODE_D / BW) * 100}%; --ratio:${BW / BH};`}
       >
         <svg class="web-lines" viewBox={`0 0 ${BW.toFixed(1)} ${BH.toFixed(1)}`} aria-hidden="true" focusable="false">
           {placed.map((n) => (
@@ -123,8 +127,8 @@ const seal = {
           ))}
         </svg>
 
-        <div class="web-seal">
-          <Seal />
+        <div class="web-center">
+          <Logo variant="wordmark-star" width="100%" />
         </div>
 
         <ul class="web-nodes" role="list" aria-label="Branches">
@@ -153,8 +157,10 @@ const seal = {
         </ul>
       </div>
 
-      <!-- Phones: the seal on top, a plain list below -->
-      <Seal class="phone-seal" decorative />
+      <!-- Phones: the wordmark on top, a plain list below -->
+      <div class="phone-center">
+        <Logo variant="wordmark-star" width="100%" decorative />
+      </div>
 
       <nav class="phone-nav" aria-label="Branches">
         <ul class="phone-list" role="list">
@@ -196,7 +202,7 @@ const seal = {
   }
 
   .web-stage,
-  .web :global(.phone-seal) {
+  .phone-center {
     order: 1;
   }
   .web-intro {
@@ -230,14 +236,14 @@ const seal = {
     height: 100%;
     overflow: visible;
   }
-  .web-seal {
+  .web-center {
     position: absolute;
-    left: var(--seal-x);
-    top: var(--seal-y);
-    width: var(--seal-w);
+    left: var(--center-x);
+    top: var(--center-y);
+    width: var(--center-w);
     translate: -50% -50%;
   }
-  .web-seal :global(.seal) {
+  .web-center :global(.logo) {
     width: 100%;
   }
 
@@ -356,8 +362,8 @@ const seal = {
   }
 
   /* ---- Entrance: once, on load ----------------------------------------------
-     seal settles, then each line draws out, then its node arrives.          */
-  @keyframes seal-in {
+     wordmark settles, then each line draws out, then its node arrives.          */
+  @keyframes center-in {
     from { opacity: 0; scale: 0.97; }
   }
   /* --len is each line's on-screen length in px, set by the script below.
@@ -373,8 +379,8 @@ const seal = {
     from { opacity: 0; }
   }
 
-  .web-seal {
-    animation: seal-in 600ms var(--ease-out) both;
+  .web-center {
+    animation: center-in 600ms var(--ease-out) both;
   }
   .branch-line path {
     animation: draw 900ms var(--ease-in-out) backwards;
@@ -391,7 +397,7 @@ const seal = {
 
   /* Reduced motion: no drawing or moving; things just appear, gently. */
   @media (prefers-reduced-motion: reduce) {
-    .web-seal,
+    .web-center,
     .web-intro {
       animation: fade-in 200ms ease both;
     }
@@ -409,7 +415,7 @@ const seal = {
   }
 
   /* ---- Phones -------------------------------------------------------------- */
-  .web :global(.phone-seal),
+  .phone-center,
   .phone-nav {
     display: none;
   }
@@ -426,11 +432,11 @@ const seal = {
     .web-stage {
       display: none;
     }
-    .web :global(.phone-seal) {
+    .phone-center {
       display: block;
-      width: min(58vw, 15rem);
-      margin: 0 auto var(--space-5);
-      animation: seal-in 500ms var(--ease-out) both;
+      width: min(82vw, 21rem);
+      margin: var(--space-5) auto var(--space-6);
+      animation: center-in 500ms var(--ease-out) both;
     }
     .web-intro {
       margin-bottom: var(--space-6);
@@ -486,7 +492,7 @@ const seal = {
   }
 
   @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
-    .web :global(.phone-seal) {
+    .phone-center {
       animation: fade-in 200ms ease both;
     }
   }
