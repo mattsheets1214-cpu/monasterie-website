@@ -601,6 +601,13 @@ const principles = [
     margin: 0 0 var(--space-2);
     max-width: none;
   }
+  /* 44px tall tap area on the credit links; the negative margin keeps the
+     line spacing exactly as it was */
+  .bi-footer-inner a {
+    display: inline-block;
+    padding-block: 11px;
+    margin-block: -11px;
+  }
 
   /* ---- Motion -------------------------------------------------------------- */
   @keyframes settle {

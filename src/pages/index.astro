@@ -52,27 +52,73 @@ const nodes = branches.map((b, i) => {
     ...b,
     i,
     href: `${base}/${b.href}`,
-    left: (nx / W) * 100,
-    top: (ny / H) * 100,
+    nx,
+    ny,
     // labels sit under the node, or above it for branches pointing up
     labelAbove: Math.sin(a) < -0.5,
-    d: `M ${sx.toFixed(1)} ${sy.toFixed(1)} Q ${qx.toFixed(1)} ${qy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+    pts: [sx, sy, qx, qy, ex, ey],
   };
 });
+
+/* Fit the box to what is actually drawn (seal, nodes and their labels),
+   so the group is always centred and as large as the screen allows,
+   however many branches there are. Labels are HTML, so their size is an
+   allowance in box units: about 11rem wide and four lines tall. */
+const LABEL_HALF_W = 80;
+const LABEL_H = 130;
+const PAD = 20;
+const xs = [C.x - sealRx, C.x + sealRx];
+const ys = [C.y - sealRy, C.y + sealRy];
+for (const n of nodes) {
+  const r = NODE_D / 2;
+  xs.push(n.nx - Math.max(r, LABEL_HALF_W), n.nx + Math.max(r, LABEL_HALF_W));
+  ys.push(n.ny - r, n.ny + r);
+  ys.push(n.labelAbove ? n.ny - r - LABEL_H : n.ny + r + LABEL_H);
+}
+const minX = Math.min(...xs) - PAD;
+const minY = Math.min(...ys) - PAD;
+const BW = Math.max(...xs) + PAD - minX;
+const BH = Math.max(...ys) + PAD - minY;
+const fx = (x: number) => (x - minX).toFixed(1);
+const fy = (y: number) => (y - minY).toFixed(1);
+
+const placed = nodes.map((n) => {
+  const [sx, sy, qx, qy, ex, ey] = n.pts;
+  return {
+    ...n,
+    left: ((n.nx - minX) / BW) * 100,
+    top: ((n.ny - minY) / BH) * 100,
+    d: `M ${fx(sx)} ${fy(sy)} Q ${fx(qx)} ${fy(qy)} ${fx(ex)} ${fy(ey)}`,
+  };
+});
+const seal = {
+  left: ((C.x - minX) / BW) * 100,
+  top: ((C.y - minY) / BH) * 100,
+  w: (SEAL_W / BW) * 100,
+};
 ---
 
 <BaseLayout ground="parchment">
   <TopBar />
   <main id="main">
     <section class="web" aria-labelledby="web-title">
+      <!-- The heading comes first for screen readers; CSS places it under the web. -->
+      <div class="web-intro">
+        <h1 id="web-title">A workshop for designing watches</h1>
+        <p class="muted">From the timeless to the futuristic.</p>
+      </div>
+
       <!-- Wide screens: the seal with branches drawn out to nodes -->
-      <div class="web-stage" style={`--seal-w:${(SEAL_W / W) * 100}%; --node-d:${(NODE_D / W) * 100}%;`}>
-        <svg class="web-lines" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
-          {nodes.map((n) => (
+      <div
+        class="web-stage"
+        style={`--seal-w:${seal.w}%; --seal-x:${seal.left}%; --seal-y:${seal.top}%; --node-d:${(NODE_D / BW) * 100}%; --ratio:${BW / BH};`}
+      >
+        <svg class="web-lines" viewBox={`0 0 ${BW.toFixed(1)} ${BH.toFixed(1)}`} aria-hidden="true" focusable="false">
+          {placed.map((n) => (
             <g class="branch-line" data-branch={n.i} style={`--i:${n.i}`}>
-              <path class="line-casing" d={n.d} pathLength="1" />
-              <path class="line-light" d={n.d} pathLength="1" />
-              <path class="line-ink" d={n.d} pathLength="1" />
+              <path class="line-casing" d={n.d} />
+              <path class="line-light" d={n.d} />
+              <path class="line-ink" d={n.d} />
             </g>
           ))}
         </svg>
@@ -82,18 +128,24 @@ const nodes = branches.map((b, i) => {
         </div>
 
         <ul class="web-nodes" role="list" aria-label="Branches">
-          {nodes.map((n) => (
+          {placed.map((n) => (
             <li
               class:list={['node', { 'label-above': n.labelAbove }]}
               style={`left:${n.left}%; top:${n.top}%; --i:${n.i}`}
             >
-              <a class="node-link" href={n.href} data-branch={n.i}>
+              <a
+                class="node-link"
+                href={n.href}
+                data-branch={n.i}
+                aria-labelledby={`node-${n.i}-title`}
+                aria-describedby={`node-${n.i}-blurb`}
+              >
                 <span class="node-disc" data-ground="plum">
                   <Logo variant={n.icon} decorative height="70%" />
                 </span>
                 <span class="node-label">
-                  <span class="node-title">{n.title}</span>
-                  <span class="node-blurb">{n.blurb}</span>
+                  <span class="node-title" id={`node-${n.i}-title`}>{n.title}</span>
+                  <span class="node-blurb" id={`node-${n.i}-blurb`}>{n.blurb}</span>
                 </span>
               </a>
             </li>
@@ -104,22 +156,22 @@ const nodes = branches.map((b, i) => {
       <!-- Phones: the seal on top, a plain list below -->
       <Seal class="phone-seal" decorative />
 
-      <div class="web-intro">
-        <h1 id="web-title">A workshop for designing watches</h1>
-        <p class="muted">From the timeless to the futuristic.</p>
-      </div>
-
       <nav class="phone-nav" aria-label="Branches">
         <ul class="phone-list" role="list">
-          {nodes.map((n) => (
+          {placed.map((n) => (
             <li>
-              <a class="phone-item" href={n.href}>
+              <a
+                class="phone-item"
+                href={n.href}
+                aria-labelledby={`phone-${n.i}-title`}
+                aria-describedby={`phone-${n.i}-blurb`}
+              >
                 <span class="phone-disc" data-ground="plum">
                   <Logo variant={n.icon} decorative height="64%" />
                 </span>
                 <span>
-                  <span class="phone-title">{n.title}</span>
-                  <span class="phone-blurb">{n.blurb}</span>
+                  <span class="phone-title" id={`phone-${n.i}-title`}>{n.title}</span>
+                  <span class="phone-blurb" id={`phone-${n.i}-blurb`}>{n.blurb}</span>
                 </span>
               </a>
             </li>
@@ -135,16 +187,24 @@ const nodes = branches.map((b, i) => {
   .web {
     height: calc(100svh - var(--bar-h));
     min-height: 34rem;
-    display: grid;
-    grid-template-rows: auto auto;
-    align-content: center;
-    justify-items: center;
-    gap: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-6);
     padding: var(--space-5) var(--grid-margin) var(--space-6);
   }
 
+  .web-stage,
+  .web :global(.phone-seal) {
+    order: 1;
+  }
   .web-intro {
+    order: 2;
     text-align: center;
+  }
+  .phone-nav {
+    order: 3;
   }
   .web-intro h1 {
     font-size: var(--text-h3);
@@ -158,8 +218,10 @@ const nodes = branches.map((b, i) => {
   .web-stage {
     position: relative;
     /* as wide as fits, but never taller than the space left on screen */
-    width: min(100%, 68rem, calc((100svh - var(--bar-h) - 12rem) * 1000 / 560));
-    aspect-ratio: 1000 / 560;
+    /* as wide as fits, but never taller than the screen space left over */
+    width: min(100%, 72rem, calc((100svh - var(--bar-h) - 13rem) * var(--ratio)));
+    aspect-ratio: var(--ratio);
+    flex: none; /* never squash it: lines and nodes share one box */
   }
   .web-lines {
     position: absolute;
@@ -170,8 +232,8 @@ const nodes = branches.map((b, i) => {
   }
   .web-seal {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: var(--seal-x);
+    top: var(--seal-y);
     width: var(--seal-w);
     translate: -50% -50%;
   }
@@ -184,8 +246,6 @@ const nodes = branches.map((b, i) => {
   .branch-line path {
     fill: none;
     stroke-linecap: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
     vector-effect: non-scaling-stroke;
   }
   .line-ink {
@@ -300,8 +360,11 @@ const nodes = branches.map((b, i) => {
   @keyframes seal-in {
     from { opacity: 0; scale: 0.97; }
   }
+  /* --len is each line's on-screen length in px, set by the script below.
+     Dashes are only used while drawing, so the finished line is always whole. */
   @keyframes draw {
-    from { stroke-dashoffset: 1; }
+    from { stroke-dasharray: var(--len) var(--len); stroke-dashoffset: var(--len); }
+    to { stroke-dasharray: var(--len) var(--len); stroke-dashoffset: 0; }
   }
   @keyframes node-in {
     from { opacity: 0; transform: translateY(6px) scale(0.96); }
@@ -314,7 +377,7 @@ const nodes = branches.map((b, i) => {
     animation: seal-in 600ms var(--ease-out) both;
   }
   .branch-line path {
-    animation: draw 900ms var(--ease-in-out) both;
+    animation: draw 900ms var(--ease-in-out) backwards;
     animation-delay: calc(350ms + var(--i) * 140ms);
   }
   .node {
@@ -353,7 +416,9 @@ const nodes = branches.map((b, i) => {
 
   @media (max-width: 767px) {
     .web {
-      display: block;
+      justify-content: flex-start;
+      align-items: stretch;
+      gap: 0;
       height: auto;
       min-height: calc(100svh - var(--bar-h));
       padding-top: var(--space-6);
@@ -428,6 +493,13 @@ const nodes = branches.map((b, i) => {
 </style>
 
 <script>
+  // Measure each line's length on screen so the draw-in covers all of it.
+  document.querySelectorAll<SVGPathElement>('.branch-line path').forEach((path) => {
+    const ctm = path.getScreenCTM();
+    const scale = ctm ? Math.hypot(ctm.a, ctm.b) : 1;
+    path.style.setProperty('--len', `${Math.ceil(path.getTotalLength() * scale) + 2}px`);
+  });
+
   // Light a branch's line while its node is hovered or focused.
   document.querySelectorAll<HTMLAnchorElement>('.node-link').forEach((link) => {
     const line = document.querySelector(`.branch-line[data-branch="${link.dataset.branch}"]`);
