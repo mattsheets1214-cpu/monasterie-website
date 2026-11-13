@@ -4,12 +4,20 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /** Keep the page out of search engines (used by /styleguide). */
+  noindex?: boolean;
+  /** Ground for the whole page: 'plum' (default) or 'parchment'. */
+  ground?: 'plum' | 'parchment';
 }
 
 const {
   title = 'Monasterie Watch Company',
-  description = 'Monasterie Watch Company — a workshop for designing watches, from the timeless to the futuristic. Conversatio Morum.',
+  description = 'Monasterie Watch Company designs watches, from the timeless to the futuristic, in the spirit of the monks who improved the human experience.',
+  noindex = false,
+  ground = 'plum',
 } = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <!doctype html>
@@ -17,17 +25,17 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.svg`} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap"
-    />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content={ground === 'plum' ? '#3c2d2e' : '#f4efe7'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
   </head>
-  <body>
+  <body data-ground={ground}>
+    <a class="skip-link" href="#main">Skip to content</a>
     <slot />
   </body>
 </html>

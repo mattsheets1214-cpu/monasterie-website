@@ -1,0 +1,699 @@
+---
+/**
+ * Hidden style guide: not linked from anywhere and marked noindex.
+ * Everything here reads the live tokens in src/styles/tokens.css,
+ * so it always shows what the site actually uses.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BellTower from '../components/BellTower.astro';
+
+const colours = [
+  { key: 'plum', name: 'Chocolate plum', role: 'Primary ground. Most things sit on it.', text: 'parchment' },
+  { key: 'parchment', name: 'Parchment', role: 'Light ground, and text and marks on plum.', text: 'ink' },
+  { key: 'cerulean', name: 'Cerulean', role: 'Decorative only: rules, seals, flourishes. Never text.', text: 'ink' },
+  { key: 'popcorn', name: 'Popcorn', role: "The beacon's light only. Never text, never a background.", text: 'ink' },
+  { key: 'ink', name: 'Ink', role: 'Reading text and one-colour marks.', text: 'parchment' },
+];
+
+// Text-on-ground pairs to check. `allowed` is the house rule, separate from the maths.
+const pairs = [
+  { fg: 'ink', bg: 'parchment', allowed: true, use: 'Body text on light pages' },
+  { fg: 'plum', bg: 'parchment', allowed: true, use: 'Headings and buttons on light pages' },
+  { fg: 'parchment', bg: 'plum', allowed: true, use: 'Text and headings on plum' },
+  { fg: 'parchment-muted', bg: 'plum', allowed: true, use: 'Secondary text on plum' },
+  { fg: 'ink-muted', bg: 'parchment', allowed: true, use: 'Secondary text on parchment' },
+  { fg: 'cerulean', bg: 'plum', allowed: false, use: 'Passes, but cerulean is never text' },
+  { fg: 'popcorn', bg: 'plum', allowed: false, use: 'Passes, but popcorn is never text' },
+  { fg: 'cerulean', bg: 'parchment', allowed: false, use: 'Fails, and never text' },
+  { fg: 'popcorn', bg: 'parchment', allowed: false, use: 'Fails, and never text' },
+];
+
+const type = [
+  { cls: 'wordmark', label: 'Wordmark', font: 'Metamorphous 400, capitals', size: '36 → 72', sample: 'Monasterie' },
+  { cls: 'h1', label: 'Heading 1', font: 'Cormorant Garamond 600', size: '40 → 56', sample: 'The bell tower' },
+  { cls: 'h2', label: 'Heading 2', font: 'Cormorant Garamond 600', size: '32 → 44', sample: 'Rules of the house' },
+  { cls: 'h3', label: 'Heading 3', font: 'Cormorant Garamond 600', size: '24 → 28', sample: 'The icon' },
+  { cls: 'h4', label: 'Heading 4', font: 'Cormorant Garamond 600', size: '20 → 22', sample: 'Case and caseback' },
+  { cls: 'body', label: 'Body', font: 'Source Serif 4 400', size: '18 → 20', sample: 'We design watches, from the timeless to the futuristic, in the spirit of the monks who improved the human experience. Every watch is built to keep your hours with care.' },
+  { cls: 'small', label: 'Small', font: 'Source Serif 4 400', size: '16', sample: 'Small text for notes, specs and the footer. Never smaller than 16px.' },
+  { cls: 'label', label: 'Label', font: 'Source Serif 4 600, capitals', size: '13', sample: 'Watch Company' },
+];
+
+const spaces = [
+  [1, 4], [2, 8], [3, 12], [4, 16], [5, 24], [6, 32], [7, 48], [8, 64], [9, 96], [10, 128],
+];
+---
+
+<BaseLayout title="Style guide · Monasterie" noindex>
+  <header class="sg-header">
+    <div class="wrap">
+      <div class="sg-brand">
+        <BellTower size={28} />
+        <p class="wordmark sg-wordmark">Monasterie</p>
+      </div>
+      <h1>Style guide</h1>
+      <p class="muted">
+        Every colour, type size, button and spacing step the site uses, read live
+        from <code>src/styles/tokens.css</code>. This page is not linked from the site
+        and is hidden from search engines.
+      </p>
+      <nav class="sg-nav" aria-label="Style guide sections">
+        <a class="btn btn-secondary btn-sm" href="#colours">Colours</a>
+        <a class="btn btn-secondary btn-sm" href="#type">Type</a>
+        <a class="btn btn-secondary btn-sm" href="#buttons">Buttons</a>
+        <a class="btn btn-secondary btn-sm" href="#spacing">Spacing</a>
+        <a class="btn btn-secondary btn-sm" href="#grid">Grid</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ================= Colours ================= -->
+    <section id="colours" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Colours</h2>
+        <p class="muted">Five colours, each with one job. Tap a hex code to copy it.</p>
+
+        <ul class="swatches" role="list">
+          {colours.map((c) => (
+            <li class="swatch">
+              <div
+                class="swatch-chip"
+                style={`background: var(--color-${c.key}); color: var(--color-${c.text});`}
+              >
+                <span class="label">{c.key}</span>
+              </div>
+              <div class="swatch-info">
+                <h3 class="h4">{c.name}</h3>
+                <button class="btn btn-text btn-sm copy" type="button" data-token={`--color-${c.key}`}>
+                  <span class="hex" data-hex={`--color-${c.key}`}>…</span>
+                </button>
+                <p class="small muted">{c.role}</p>
+                <p class="small"><code>var(--color-{c.key})</code></p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <h3 class="sg-sub">Text contrast</h3>
+        <p class="muted small">
+          WCAG AA asks for 4.5:1 for reading text. Ratios below are worked out on this page
+          from the live tokens.
+        </p>
+        <div class="table-scroll">
+          <table class="contrast">
+            <thead>
+              <tr>
+                <th scope="col">Sample</th>
+                <th scope="col">Text on ground</th>
+                <th scope="col">Ratio</th>
+                <th scope="col">Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pairs.map((p) => (
+                <tr data-fg={`--color-${p.fg}`} data-bg={`--color-${p.bg}`} data-allowed={String(p.allowed)}>
+                  <td>
+                    <span class="pair-sample" style={`color: var(--color-${p.fg}); background: var(--color-${p.bg});`}>Aa</span>
+                  </td>
+                  <td class="small">{p.fg} on {p.bg}</td>
+                  <td class="small ratio">…</td>
+                  <td class="small">
+                    <span class="verdict">{p.allowed ? 'Allowed' : 'Not for text'}</span>
+                    <span class="muted"> · {p.use}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Type ================= -->
+    <section id="type" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Type</h2>
+        <p class="muted">
+          Metamorphous is for the name only. Cormorant Garamond for headings,
+          Source Serif 4 for reading. Sizes shrink from desktop to phone; "this screen"
+          shows what your device is rendering right now.
+        </p>
+        <div class="type-list">
+          {type.map((t) => (
+            <div class="type-row">
+              <div class="type-meta small">
+                <strong>{t.label}</strong>
+                <span class="muted">{t.font}</span>
+                <span class="muted">{t.size}px</span>
+                <span class="muted">This screen: <span class="measure" data-measure={t.cls}>…</span></span>
+              </div>
+              <p class={`${t.cls} type-sample`} id={`sample-${t.cls}`}>{t.sample}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="type-pair">
+          <h3>Headings and body together</h3>
+          <p>
+            A Cormorant heading sits over Source Serif 4 body copy. Body text keeps to about
+            65 characters a line so it stays easy to read on a wide screen, and
+            <a href="#type">links are underlined</a> so they read as links without colour.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Buttons ================= -->
+    <section id="buttons" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Buttons</h2>
+        <p class="muted">
+          Three styles, two sizes, 4px corners. On desktop they lift on hover and press on
+          click; on a phone, press and hold to see the pressed state. Tab with a keyboard to
+          see the focus ring.
+        </p>
+      </div>
+
+      {(['plum', 'parchment'] as const).map((g) => (
+        <div class="btn-panel" data-ground={g}>
+          <div class="wrap">
+            <p class="label muted">On {g}</p>
+            <div class="btn-grid">
+              <div class="btn-row">
+                <button class="btn btn-primary" type="button">Order a watch</button>
+                <button class="btn btn-secondary" type="button">See the specs</button>
+                <button class="btn btn-text" type="button">Read the story</button>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary btn-sm" type="button">Small primary</button>
+                <button class="btn btn-secondary btn-sm" type="button">Small secondary</button>
+                <button class="btn btn-text btn-sm" type="button">Small text</button>
+              </div>
+              <div class="btn-row">
+                <button class="btn btn-primary" type="button" disabled>Disabled</button>
+                <button class="btn btn-secondary" type="button" disabled>Disabled</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div class="wrap">
+        <div class="table-scroll">
+          <table class="spec small">
+            <thead>
+              <tr><th scope="col">Class</th><th scope="col">Height</th><th scope="col">Use</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>.btn .btn-primary</code></td><td>48px</td><td>The one main action on a screen</td></tr>
+              <tr><td><code>.btn .btn-secondary</code></td><td>48px</td><td>Other actions beside it</td></tr>
+              <tr><td><code>.btn .btn-text</code></td><td>48px</td><td>Quiet links that act like buttons</td></tr>
+              <tr><td><code>+ .btn-sm</code></td><td>44px</td><td>Tight spaces; still a full thumb target</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Spacing + corners ================= -->
+    <section id="spacing" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Spacing and corners</h2>
+        <p class="muted">One scale in 4px steps. Use these, never one-off numbers.</p>
+        <ul class="space-list" role="list">
+          {spaces.map(([n, px]) => (
+            <li class="space-row">
+              <code class="small">--space-{n}</code>
+              <span class="small muted space-px">{px}px</span>
+              <span class="space-bar" style={`width: var(--space-${n});`}></span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 class="sg-sub">Corners</h3>
+        <div class="radius-row">
+          <div class="radius-demo" data-ground="plum">
+            <span class="small">4px</span>
+          </div>
+          <p class="small muted">
+            <code>var(--radius)</code> is the only corner on the site: buttons, cards, images
+            and inputs all use it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Grid ================= -->
+    <section id="grid" class="sg-section" data-ground="parchment">
+      <div class="wrap">
+        <h2>Grid</h2>
+        <p class="muted">
+          4 columns on phones, 8 from 768px wide, 12 from 1024px. Content stops at 1200px.
+          On a phone every block below runs full width; rotate it or open the page on a
+          laptop to see halves and thirds.
+        </p>
+        <p class="small grid-readout" aria-live="polite">
+          This screen: <strong class="grid-now">…</strong>
+        </p>
+        <div class="grid grid-demo" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => <div class="grid-col"><span>{i + 1}</span></div>)}
+        </div>
+        <div class="grid grid-example">
+          <div class="ex ex-full small">Full width</div>
+          <div class="ex ex-half small">Half: 6 of 12</div>
+          <div class="ex ex-half small">Half: 6 of 12</div>
+          <div class="ex ex-third small">Third: 4 of 12</div>
+          <div class="ex ex-third small">Third: 4 of 12</div>
+          <div class="ex ex-third small">Third: 4 of 12</div>
+        </div>
+        <button class="btn btn-primary btn-sm grid-toggle" type="button" aria-pressed="false">
+          Show grid over the page
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sg-footer">
+    <div class="wrap">
+      <p class="small muted">Monasterie Watch Company · Conversatio Morum</p>
+    </div>
+  </footer>
+
+  <div class="grid-overlay" hidden aria-hidden="true">
+    <div class="wrap">
+      <div class="grid">
+        {Array.from({ length: 12 }, () => <div class="grid-col"></div>)}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .sg-header {
+    padding-block: var(--space-8) var(--space-7);
+  }
+  .sg-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-7);
+  }
+  .sg-wordmark {
+    font-size: var(--text-h4);
+    padding-top: 0.15em;
+  }
+  .sg-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .sg-section {
+    padding-block: var(--space-8);
+    border-top: var(--border-width) solid color-mix(in srgb, var(--rule) 25%, transparent);
+    scroll-margin-top: 0;
+  }
+  .sg-sub {
+    margin-top: var(--space-7);
+  }
+
+  code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.875em;
+  }
+
+  /* Colours */
+  .swatches {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 0;
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .swatches { grid-template-columns: repeat(5, 1fr); }
+  }
+  .swatch {
+    border: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 6.5rem 1fr; /* phones: chip beside the details */
+  }
+  @media (min-width: 640px) {
+    .swatch {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+    }
+  }
+  .swatch-chip .label {
+    display: none; /* the name sits right beside it on phones */
+  }
+  @media (min-width: 640px) {
+    .swatch-chip .label { display: inline; }
+  }
+  .swatch-chip {
+    min-height: 7.5rem;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--space-3);
+    border-right: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+  }
+  @media (min-width: 640px) {
+    .swatch-chip {
+      border-right: 0;
+      border-bottom: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+    }
+  }
+  .swatch-info {
+    padding: var(--space-4);
+  }
+  .swatch-info h3 {
+    margin-bottom: var(--space-1);
+  }
+  .swatch-info p {
+    margin-bottom: var(--space-2);
+  }
+  .copy {
+    margin-left: calc(-1 * var(--space-1));
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-weight: 500;
+  }
+
+  .table-scroll {
+    overflow-x: auto;
+    margin-top: var(--space-5);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 30rem;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: var(--space-3) var(--space-3) var(--space-3) 0;
+    border-bottom: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+    vertical-align: middle;
+  }
+  th {
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    font-weight: var(--weight-body-strong);
+  }
+  .pair-sample {
+    display: inline-grid;
+    place-items: center;
+    width: var(--space-8);
+    height: var(--space-7);
+    border-radius: var(--radius);
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: var(--text-h3);
+    border: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+  }
+  .ratio {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  @media (max-width: 639px) {
+    .contrast {
+      min-width: 0;
+    }
+    .contrast thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .contrast tr {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: var(--space-4);
+      align-items: center;
+      padding-block: var(--space-3);
+      border-bottom: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+    }
+    .contrast td {
+      border: 0;
+      padding: 0;
+    }
+    .contrast td:first-child {
+      grid-row: span 3;
+    }
+  }
+  tr[data-allowed='false'] .verdict {
+    font-weight: var(--weight-body-strong);
+  }
+
+  /* Type */
+  .type-list {
+    margin-top: var(--space-6);
+  }
+  .type-row {
+    padding-block: var(--space-5);
+    border-bottom: var(--border-width) solid color-mix(in srgb, var(--text) 15%, transparent);
+  }
+  .type-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+  .type-sample {
+    margin: 0;
+    max-width: none;
+    overflow-wrap: anywhere;
+  }
+  .type-sample.body,
+  .type-sample.small {
+    max-width: 65ch;
+  }
+  .type-sample.wordmark,
+  .type-sample.h1,
+  .type-sample.h2,
+  .type-sample.h3,
+  .type-sample.h4 {
+    color: var(--heading);
+  }
+  .type-pair {
+    margin-top: var(--space-7);
+    padding: var(--space-6);
+    border-left: 2px solid var(--color-cerulean);
+  }
+
+  /* Buttons */
+  .btn-panel {
+    padding-block: var(--space-6);
+    margin-block: var(--space-5);
+  }
+  .btn-grid {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-3);
+  }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Spacing */
+  .space-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-6) 0 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .space-row {
+    display: grid;
+    grid-template-columns: 6.5rem 3.5rem 1fr;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .space-px {
+    font-variant-numeric: tabular-nums;
+  }
+  .space-bar {
+    display: block;
+    height: var(--space-4);
+    background: var(--color-plum);
+    border-radius: 1px;
+    max-width: 100%;
+  }
+  .radius-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin-top: var(--space-4);
+  }
+  .radius-demo {
+    flex: none;
+    width: var(--space-9);
+    height: var(--space-9);
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius);
+  }
+  .radius-row p {
+    margin: 0;
+  }
+
+  /* Grid */
+  .grid-readout {
+    margin-top: var(--space-4);
+  }
+  .grid-demo {
+    margin-top: var(--space-5);
+  }
+  .grid-col {
+    height: var(--space-9);
+    background: color-mix(in srgb, var(--color-cerulean) 55%, transparent);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: var(--space-2);
+    font-size: var(--text-label);
+  }
+  /* Only show as many demo columns as the grid has */
+  .grid-demo .grid-col:nth-child(n + 5) { display: none; }
+  @media (min-width: 768px) {
+    .grid-demo .grid-col:nth-child(n + 5) { display: flex; }
+    .grid-demo .grid-col:nth-child(n + 9) { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .grid-demo .grid-col:nth-child(n + 9) { display: flex; }
+  }
+
+  .grid-example {
+    margin-top: var(--space-5);
+  }
+  .ex {
+    background: var(--color-plum);
+    color: var(--color-parchment);
+    border-radius: var(--radius);
+    padding: var(--space-3) var(--space-4);
+    grid-column: 1 / -1;
+  }
+  @media (min-width: 768px) {
+    .ex-half { grid-column: span 4; }
+    .ex-third { grid-column: span 8; }
+  }
+  @media (min-width: 1024px) {
+    .ex-half { grid-column: span 6; }
+    .ex-third { grid-column: span 4; }
+  }
+  .grid-toggle {
+    margin-top: var(--space-6);
+  }
+
+  .grid-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+  .grid-overlay .grid {
+    height: 100vh;
+  }
+  .grid-overlay .grid-col {
+    height: 100%;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--color-cerulean) 22%, transparent);
+    outline: 1px solid color-mix(in srgb, var(--color-cerulean) 70%, transparent);
+  }
+  .grid-overlay .grid-col:nth-child(n + 5) { display: none; }
+  @media (min-width: 768px) {
+    .grid-overlay .grid-col:nth-child(n + 5) { display: block; }
+    .grid-overlay .grid-col:nth-child(n + 9) { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .grid-overlay .grid-col:nth-child(n + 9) { display: block; }
+  }
+
+  .sg-footer {
+    padding-block: var(--space-7);
+  }
+</style>
+
+<script>
+  const root = getComputedStyle(document.documentElement);
+  const token = (name: string) => root.getPropertyValue(name).trim();
+
+  // Hex readouts
+  document.querySelectorAll<HTMLElement>('[data-hex]').forEach((el) => {
+    el.textContent = token(el.dataset.hex!).toUpperCase();
+  });
+
+  // Copy hex on tap
+  document.querySelectorAll<HTMLButtonElement>('.copy').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const hex = token(btn.dataset.token!).toUpperCase();
+      const label = btn.querySelector('.hex')!;
+      try {
+        await navigator.clipboard.writeText(hex);
+        label.textContent = `${hex} copied`;
+      } catch {
+        label.textContent = hex;
+      }
+      setTimeout(() => (label.textContent = hex), 1400);
+    });
+  });
+
+  // Contrast ratios from live tokens
+  const lum = (hex: string) => {
+    const h = hex.replace('#', '');
+    const c = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = c.map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  document.querySelectorAll<HTMLTableRowElement>('tr[data-fg]').forEach((row) => {
+    const a = lum(token(row.dataset.fg!));
+    const b = lum(token(row.dataset.bg!));
+    const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    const pass = ratio >= 4.5;
+    row.querySelector('.ratio')!.textContent = `${ratio.toFixed(1)} : 1 ${pass ? 'AA pass' : 'fail'}`;
+  });
+
+  // Live type sizes and grid readout
+  const update = () => {
+    document.querySelectorAll<HTMLElement>('[data-measure]').forEach((el) => {
+      const sample = document.getElementById(`sample-${el.dataset.measure}`);
+      if (!sample) return;
+      const cs = getComputedStyle(sample);
+      const size = Math.round(parseFloat(cs.fontSize));
+      const lh = Math.round(parseFloat(cs.lineHeight));
+      el.textContent = `${size}px / ${lh}px`;
+    });
+    const cols = token('--grid-columns');
+    const probe = document.querySelector<HTMLElement>('.grid-demo')!;
+    const gap = Math.round(parseFloat(getComputedStyle(probe).columnGap));
+    const wrap = probe.closest<HTMLElement>('.wrap')!;
+    const margin = Math.round(parseFloat(getComputedStyle(wrap).paddingLeft));
+    document.querySelector('.grid-now')!.textContent =
+      `${window.innerWidth}px wide · ${cols} columns · ${gap}px gutter · ${margin}px margins`;
+  };
+  update();
+  addEventListener('resize', update);
+
+  // Grid overlay toggle
+  const toggle = document.querySelector<HTMLButtonElement>('.grid-toggle')!;
+  const overlay = document.querySelector<HTMLElement>('.grid-overlay')!;
+  toggle.addEventListener('click', () => {
+    const on = overlay.hidden;
+    overlay.hidden = !on;
+    toggle.setAttribute('aria-pressed', String(on));
+    toggle.textContent = on ? 'Hide grid overlay' : 'Show grid over the page';
+  });
+</script>

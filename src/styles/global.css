@@ -1,33 +1,249 @@
-:root {
-  --ink: #1c1a17;
-  --parchment: #f4efe6;
-  --stone: #8a8174;
-  --bronze: #9a6b34;
+/* Self-hosted fonts (served from this site, no Google Fonts request) */
+@import '@fontsource/metamorphous/400.css';
+@import '@fontsource-variable/cormorant-garamond/wght.css';
+@import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+@import '@fontsource-variable/source-serif-4/opsz.css';
+@import '@fontsource-variable/source-serif-4/opsz-italic.css';
 
-  --serif: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
-  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-}
+@import './tokens.css';
 
+/* ---- Base ---------------------------------------------------------------- */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-html,
-body {
-  margin: 0;
-  min-height: 100%;
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: var(--parchment);
-  color: var(--ink);
-  font-family: var(--sans);
-  line-height: 1.6;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--weight-body);
+  line-height: var(--leading-body);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+[data-ground] {
+  background: var(--bg);
+  color: var(--text);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+p {
+  margin: 0 0 var(--space-4);
+  max-width: 65ch;
 }
 
 a {
   color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius);
+}
+
+hr {
+  border: 0;
+  border-top: var(--border-width) solid var(--rule);
+  margin: var(--space-7) 0;
+}
+
+/* ---- Type ------------------------------------------------------------------ */
+.wordmark {
+  font-family: var(--font-wordmark);
+  font-weight: 400;
+  font-size: var(--text-wordmark);
+  line-height: var(--leading-wordmark);
+  letter-spacing: var(--tracking-wordmark);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+.h1,
+.h2,
+.h3,
+.h4 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-heading);
+  color: var(--heading);
+  margin: 0 0 var(--space-4);
+  text-wrap: balance;
+}
+
+h1, .h1 { font-size: var(--text-h1); line-height: var(--leading-h1); }
+h2, .h2 { font-size: var(--text-h2); line-height: var(--leading-h2); }
+h3, .h3 { font-size: var(--text-h3); line-height: var(--leading-h3); }
+h4, .h4 { font-size: var(--text-h4); line-height: var(--leading-h4); }
+
+.body { font-size: var(--text-body); line-height: var(--leading-body); }
+
+.small {
+  font-size: var(--text-small);
+  line-height: var(--leading-small);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.label {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: var(--weight-body-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* ---- Layout: wrap + grid ------------------------------------------------- */
+.wrap {
+  width: 100%;
+  max-width: calc(var(--grid-max) + 2 * var(--grid-margin));
+  margin-inline: auto;
+  padding-inline: var(--grid-margin);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+  gap: var(--grid-gutter);
+}
+
+/* ---- Buttons ----------------------------------------------------------------
+   .btn + one of .btn-primary / .btn-secondary / .btn-text
+   Add .btn-sm for the compact size (still 44px tall for thumbs).          */
+.btn {
+  --btn-h: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--btn-h);
+  padding: 0 var(--space-5);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--weight-body-strong);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-sm {
+  --btn-h: var(--tap-min);
+  padding: 0 var(--space-4);
+}
+
+.btn-primary {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: currentColor;
+}
+
+.btn-text {
+  padding-inline: var(--space-1);
+  background: transparent;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  transition: text-decoration-color var(--dur-base) var(--ease);
+}
+
+@media (hover: hover) {
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 0 rgb(0 0 0 / 0.28);
+  }
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--text) 8%, transparent);
+  }
+}
+
+.btn-text:hover,
+.btn-text:focus-visible,
+.btn-text:active {
+  text-decoration-color: currentColor;
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ---- Accessibility helpers ---------------------------------------------- */
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--space-3) var(--space-4);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border-radius: var(--radius);
+}
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

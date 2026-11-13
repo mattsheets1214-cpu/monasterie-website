@@ -51,13 +51,31 @@ monasterie-website/
 │   ├── components/         # Reusable pieces of UI (e.g. BellTower.astro logo)
 │   ├── layouts/            # Page shells: <head>, fonts, shared wrapper (BaseLayout.astro)
 │   ├── pages/              # Every file here becomes a URL
-│   │   └── index.astro     #   → the homepage (/)
+│   │   ├── index.astro     #   → the homepage (/)
+│   │   └── styleguide.astro#   → hidden style guide (/styleguide), not linked, noindex
 │   └── styles/
-│       └── global.css      # Brand colors, fonts, site-wide styles
+│       ├── tokens.css      # Design tokens: colours, fonts, type scale, spacing, radius, grid
+│       └── global.css      # Fonts, base styles, .wrap/.grid, headings, buttons
 ├── astro.config.mjs        # Astro settings (site URL + base path for GitHub Pages)
 ├── package.json            # Dependencies and npm scripts
 └── tsconfig.json           # TypeScript settings for editor support
 ```
+
+## Design tokens and the style guide
+
+All brand values live in `src/styles/tokens.css`: change one there and the whole site follows. Build with the tokens instead of typing raw values:
+
+- **Colours:** `--color-plum`, `--color-parchment`, `--color-cerulean`, `--color-popcorn`, `--color-ink`. Cerulean and popcorn are never used for text.
+- **Grounds:** put `data-ground="plum"` (default) or `data-ground="parchment"` on a section, and use `var(--bg)`, `var(--text)`, `var(--heading)` and `var(--text-muted)` so components work on either ground.
+- **Type:** `.wordmark` (Metamorphous, the name only), `h1`–`h4` (Cormorant Garamond), body text (Source Serif 4), `.small`, `.label`.
+- **Spacing:** `--space-1` to `--space-10` (4, 8, 12, 16, 24, 32, 48, 64, 96, 128px).
+- **Corners:** `--radius` (4px) is the only radius.
+- **Grid:** `.wrap` for page edges, `.grid` for 4 / 8 / 12 columns (phone / 768px+ / 1024px+).
+- **Buttons:** `.btn` plus `.btn-primary`, `.btn-secondary` or `.btn-text`; add `.btn-sm` for the 44px size.
+
+To check them, open `/monasterie-website/styleguide/`. It isn't linked from the site and tells search engines not to index it, but anyone with the URL can open it.
+
+Fonts are self-hosted from npm (`@fontsource`), so there's no Google Fonts request.
 
 ### Adding a new page
 

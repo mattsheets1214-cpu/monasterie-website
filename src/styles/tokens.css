@@ -1,0 +1,126 @@
+/* ==========================================================================
+   Monasterie design tokens
+   One place for every colour, font, size, space, corner and grid value.
+   Change a value here and the whole site (and /styleguide) follows.
+   Source: Monasterie Brand Kit v1.0 (Nov 2026).
+   ========================================================================== */
+
+:root {
+  /* ---- Brand colours (raw) -------------------------------------------- */
+  /* Each has one job. Popcorn and cerulean are never used for text.        */
+  --color-plum: #3c2d2e;      /* Chocolate plum: primary ground             */
+  --color-parchment: #f4efe7; /* Light ground; text and marks on plum       */
+  --color-cerulean: #9bb7d4;  /* Decorative only: rules, seals, flourishes  */
+  --color-popcorn: #f8de8d;   /* The beacon's light only                    */
+  --color-ink: #1c1314;       /* Reading text and one-colour marks          */
+
+  /* Muted text: 75% of the text colour over its ground, as solid values
+     so they never shift. Both pass WCAG AA for body text (7:1+).          */
+  --color-parchment-muted: #c6beb9; /* on plum, 7.1:1      */
+  --color-ink-muted: #524a49;       /* on parchment, 7.5:1 */
+
+  /* ---- Fonts ------------------------------------------------------------ */
+  --font-wordmark: 'Metamorphous', 'Cormorant Garamond Variable', Georgia, serif;
+  --font-heading: 'Cormorant Garamond Variable', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, serif;
+
+  --weight-body: 400;
+  --weight-body-strong: 600;
+  --weight-heading: 600;
+
+  /* ---- Type scale ------------------------------------------------------
+     Desktop sizes follow the Brand Kit; each shrinks smoothly to the
+     phone size (first clamp value) on narrow screens.                     */
+  --text-wordmark: clamp(2.25rem, 1.4rem + 4vw, 4.5rem); /* 36 → 72 */
+  --text-h1: clamp(2.5rem, 1.9rem + 2.6vw, 3.5rem);      /* 40 → 56 */
+  --text-h2: clamp(2rem, 1.6rem + 1.9vw, 2.75rem);       /* 32 → 44 */
+  --text-h3: clamp(1.5rem, 1.35rem + 0.6vw, 1.75rem);    /* 24 → 28 */
+  --text-h4: clamp(1.25rem, 1.2rem + 0.25vw, 1.375rem);  /* 20 → 22 */
+  --text-body: clamp(1.125rem, 1.06rem + 0.3vw, 1.25rem);/* 18 → 20 */
+  --text-small: 1rem;                                    /* 16      */
+  --text-label: 0.8125rem;                               /* 13, caps labels only */
+
+  --leading-wordmark: 1;
+  --leading-h1: 1.05;
+  --leading-h2: 1.08;
+  --leading-h3: 1.2;
+  --leading-h4: 1.25;
+  --leading-body: 1.6;
+  --leading-small: 1.5;
+
+  --tracking-wordmark: 0.12em; /* Metamorphous is always set in capitals */
+  --tracking-label: 0.16em;
+
+  /* ---- Spacing scale (4px steps) --------------------------------------- */
+  --space-1: 0.25rem; /*   4 */
+  --space-2: 0.5rem;  /*   8 */
+  --space-3: 0.75rem; /*  12 */
+  --space-4: 1rem;    /*  16 */
+  --space-5: 1.5rem;  /*  24 */
+  --space-6: 2rem;    /*  32 */
+  --space-7: 3rem;    /*  48 */
+  --space-8: 4rem;    /*  64 */
+  --space-9: 6rem;    /*  96 */
+  --space-10: 8rem;   /* 128 */
+
+  /* ---- Corners ---------------------------------------------------------- */
+  --radius: 4px; /* the only corner radius on the site */
+
+  /* ---- Grid --------------------------------------------------------------
+     4 columns on phones, 8 from 768px, 12 from 1024px.
+     Breakpoints can't be variables inside @media, so they are written as
+     768px and 1024px in global.css; keep them in sync with these notes.   */
+  --grid-max: 75rem;                         /* 1200px content width  */
+  --grid-margin: clamp(1.25rem, 5vw, 4rem);  /* 20 → 64 page margin   */
+  --grid-columns: 4;
+  --grid-gutter: var(--space-4);             /* 16 on phones          */
+
+  /* ---- Lines, focus, motion -------------------------------------------- */
+  --border-width: 1px;
+  --focus-width: 2px;
+  --focus-offset: 3px;
+  --tap-min: 44px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --grid-columns: 8;
+    --grid-gutter: var(--space-5); /* 24 */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --grid-columns: 12;
+  }
+}
+
+/* ---- Grounds ---------------------------------------------------------------
+   Semantic colours change with the ground. Put data-ground="plum" or
+   data-ground="parchment" on any section; components read only these.     */
+:root,
+[data-ground='plum'] {
+  --bg: var(--color-plum);
+  --text: var(--color-parchment);
+  --text-muted: var(--color-parchment-muted);
+  --heading: var(--color-parchment);
+  --rule: var(--color-cerulean);
+  --focus: var(--color-parchment);
+  --btn-bg: var(--color-parchment);
+  --btn-text: var(--color-plum);
+}
+
+[data-ground='parchment'] {
+  --bg: var(--color-parchment);
+  --text: var(--color-ink);
+  --text-muted: var(--color-ink-muted);
+  --heading: var(--color-plum);
+  --rule: var(--color-plum);
+  --focus: var(--color-ink);
+  --btn-bg: var(--color-plum);
+  --btn-text: var(--color-parchment);
+}

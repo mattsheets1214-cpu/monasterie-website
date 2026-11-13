@@ -4,74 +4,58 @@ import BellTower from '../components/BellTower.astro';
 ---
 
 <BaseLayout>
-  <main>
-    <div class="mark"><BellTower size={64} /></div>
-    <h1>Monasterie</h1>
-    <p class="sub">Watch Company</p>
-    <p class="motto">Conversatio Morum</p>
-    <hr />
-    <p class="lede">
-      A workshop for designing watches, from the timeless to the futuristic.
-      Built to keep your hours with care.
-    </p>
-    <p class="soon">Site under construction</p>
+  <main id="main" class="hero">
+    <div class="wrap">
+      <div class="mark"><BellTower size={56} /></div>
+      <h1 class="wordmark">Monasterie</h1>
+      <p class="label muted sub">Watch Company</p>
+      <p class="motto">Conversatio Morum</p>
+      <hr />
+      <p class="lede">
+        We design watches, from the timeless to the futuristic, in the spirit of
+        the monks who improved the human experience.
+      </p>
+      <p class="label muted soon">Site under construction</p>
+    </div>
   </main>
 </BaseLayout>
 
 <style>
-  main {
-    min-height: 100vh;
+  .hero {
+    min-height: 100svh;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
-    padding: 4rem 1.5rem;
+    padding-block: var(--space-9);
+  }
+  .hero .wrap > * {
+    margin-inline: auto;
   }
   .mark {
-    color: var(--bronze);
-    margin-bottom: 1.5rem;
+    color: var(--text);
+    width: max-content;
+    margin-bottom: var(--space-6);
   }
-  h1 {
-    font-family: var(--serif);
-    font-weight: 500;
-    font-size: clamp(3rem, 9vw, 5.5rem);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin: 0;
-    line-height: 1;
-    padding-left: 0.18em; /* optically re-centre tracked caps */
+  .wordmark {
+    padding-left: var(--tracking-wordmark); /* re-centre tracked capitals */
   }
   .sub {
-    font-size: 0.8rem;
-    letter-spacing: 0.4em;
-    text-transform: uppercase;
-    color: var(--stone);
-    margin: 1rem 0 0;
-    padding-left: 0.4em;
+    margin-top: var(--space-4);
   }
   .motto {
-    font-family: var(--serif);
+    font-family: var(--font-heading);
     font-style: italic;
-    font-size: 1.35rem;
-    margin: 2rem 0 0;
+    font-size: var(--text-h4);
+    margin-top: var(--space-6);
   }
   hr {
-    width: 48px;
-    border: 0;
-    border-top: 1px solid var(--bronze);
-    margin: 2rem auto;
+    width: var(--space-7);
+    margin: var(--space-6) auto;
   }
   .lede {
-    max-width: 32rem;
-    margin: 0;
-    font-size: 1.05rem;
+    max-width: 34rem;
   }
   .soon {
-    margin-top: 3rem;
-    font-size: 0.72rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--stone);
+    margin-top: var(--space-7);
   }
 </style>
