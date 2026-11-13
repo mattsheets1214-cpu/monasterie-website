@@ -4,19 +4,29 @@ import TopBar from '../components/TopBar.astro';
 import Logo from '../components/Logo.astro';
 import Seal from '../components/Seal.astro';
 
-/* Photos load from Wikimedia Commons. Credits are in the footer. */
+/* STAND-IN PHOTOS from Unsplash (free under the Unsplash License).
+   REPLACE WITH MY OWN: put your photos in public/images/ and change `src`
+   to e.g. `${base}/images/bell-tower.jpg`, then update `alt` and the
+   credit line in the footer. Unsplash crops them to the frame size here. */
+const unsplash = (id: string, w: number, h: number) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
+
 const photos = {
-  belfry: {
-    src: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Belfort_Brugge.jpg',
-    width: 1024,
-    height: 1536,
-    alt: 'The medieval belfry of Bruges, Belgium, rising above the town.',
+  // REPLACE WITH MY OWN: bell tower (stand-in: Bruges, by Loris Boulinguez)
+  tower: {
+    src: unsplash('photo-1759338045442-017c39e79568', 960, 1200),
+    src2x: unsplash('photo-1759338045442-017c39e79568', 1920, 2400),
+    width: 960,
+    height: 1200,
+    alt: 'A tall medieval bell tower against a cloudy sky in Bruges, Belgium.',
   },
-  clock: {
-    src: 'https://upload.wikimedia.org/wikipedia/commons/6/64/Salisbury.cathedral.clock.arp.jpg',
-    width: 2028,
-    height: 1602,
-    alt: 'The iron gears of the medieval clock at Salisbury Cathedral, built around 1386.',
+  // REPLACE WITH MY OWN: workshop or clock mechanism (stand-in: watch gears, by Laura Ockel)
+  workshop: {
+    src: unsplash('photo-1593153041370-5ebf6b82886a', 1200, 900),
+    src2x: unsplash('photo-1593153041370-5ebf6b82886a', 2400, 1800),
+    width: 1200,
+    height: 900,
+    alt: 'Close-up of metal gears, wheels and springs taken from old watches.',
   },
 };
 
@@ -93,11 +103,13 @@ const principles = [
           </p>
         </div>
         <figure class="bi-photo bi-photo-tall">
+          <!-- REPLACE WITH MY OWN: stand-in photo from Unsplash -->
           <img
-            src={photos.belfry.src}
-            width={photos.belfry.width}
-            height={photos.belfry.height}
-            alt={photos.belfry.alt}
+            src={photos.tower.src}
+            srcset={`${photos.tower.src} 1x, ${photos.tower.src2x} 2x`}
+            width={photos.tower.width}
+            height={photos.tower.height}
+            alt={photos.tower.alt}
             loading="lazy"
             decoding="async"
           />
@@ -109,11 +121,13 @@ const principles = [
     <section class="bi-screen" aria-labelledby="workshop">
       <div class="wrap bi-workshop">
         <figure class="bi-photo bi-photo-wide">
+          <!-- REPLACE WITH MY OWN: stand-in photo from Unsplash -->
           <img
-            src={photos.clock.src}
-            width={photos.clock.width}
-            height={photos.clock.height}
-            alt={photos.clock.alt}
+            src={photos.workshop.src}
+            srcset={`${photos.workshop.src} 1x, ${photos.workshop.src2x} 2x`}
+            width={photos.workshop.width}
+            height={photos.workshop.height}
+            alt={photos.workshop.alt}
             loading="lazy"
             decoding="async"
           />
@@ -142,7 +156,7 @@ const principles = [
     <section class="bi-screen bi-motto" data-ground="plum" aria-labelledby="motto">
       <div class="wrap">
         <p class="label muted">Our motto</p>
-        <h2 id="motto" class="bi-motto-title"><span>Conversatio Morum</span></h2>
+        <h2 id="motto" class="bi-motto-title"><span>Conversatio</span> <span>Morum</span></h2>
         <div class="bi-motto-text">
           <p>
             Each monk took a vow called <em>conversatio morum</em>, a promise to keep changing
@@ -267,11 +281,10 @@ const principles = [
     <div class="wrap bi-footer-inner">
       <p class="small">Monasterie Watch Company · Conversatio Morum</p>
       <p class="small muted">
-        Photos:{' '}
-        <a href="https://commons.wikimedia.org/wiki/File:Belfort_Brugge.jpg">Belfry of Bruges</a>{' '}
-        by L. Ellis, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>.{' '}
-        <a href="https://commons.wikimedia.org/wiki/File:Salisbury.cathedral.clock.arp.jpg">Salisbury Cathedral clock</a>{' '}
-        by Adrian Pingstone, public domain.
+        Photos from Unsplash: bell tower by{' '}
+        <a href="https://unsplash.com/photos/historic-bell-tower-against-a-cloudy-sky-7xWcn4hzR-4">Loris Boulinguez</a>,
+        watch gears by{' '}
+        <a href="https://unsplash.com/photos/gold-and-silver-studded-accessory-RZSrqJjhkeg">Laura Ockel</a>.
       </p>
     </div>
   </footer>
@@ -279,10 +292,13 @@ const principles = [
 
 <style>
   /* ---- Screens -------------------------------------------------------------
-     Each section is about one screen tall on wide screens; on phones they
-     grow with their text so nothing gets cut off.                          */
+     Every section is exactly one or two screens tall. A small script below
+     measures each one and sets --h to 1, or 2 when its content needs it
+     (phones, tablets). Without the script they fall back to at least one
+     screen, so nothing is ever cut off.                                     */
   .bi-screen {
-    min-height: calc(100svh - var(--bar-h));
+    --screen: calc(100svh - var(--bar-h));
+    min-height: var(--screen);
     display: flex;
     align-items: center;
     padding-block: var(--space-9);
@@ -291,8 +307,15 @@ const principles = [
   .bi-screen > .wrap {
     width: 100%;
   }
+  :global(.js) .bi-screen[data-h] {
+    min-height: 0;
+    height: calc(var(--h) * var(--screen));
+  }
   .bi-screen[data-ground='plum'] {
     border-top: 0;
+  }
+  .bi-motto {
+    padding-block: var(--space-7);
   }
 
   .bi-text h2 {
@@ -313,6 +336,14 @@ const principles = [
     display: flex;
     align-items: center;
     text-align: center;
+  }
+  /* very short screens (small phones): let the hero grow instead of clipping */
+  @media (max-height: 700px) {
+    .bi-hero {
+      height: auto;
+      min-height: calc(100svh - var(--bar-h));
+      padding-block: var(--space-7);
+    }
   }
   .bi-hero-inner {
     display: grid;
@@ -406,17 +437,24 @@ const principles = [
   }
 
   /* ---- 4. Motto: the moment ----------------------------------------------- */
+  /* The big type moment: the motto fills the screen. Sized by width and
+     by height so both lines always fit on one screen. */
   .bi-motto-title {
     font-family: var(--font-heading);
     font-style: italic;
     font-weight: 500;
-    font-size: clamp(3.5rem, 2rem + 8vw, 10rem);
-    line-height: 0.95;
-    letter-spacing: -0.01em;
-    margin: var(--space-4) 0 var(--space-7);
+    font-size: min(21vw, 17svh);
+    line-height: 0.92;
+    letter-spacing: -0.015em;
+    color: var(--color-parchment);
+    margin: var(--space-3) 0 var(--space-6);
   }
   .bi-motto-title span {
-    display: inline-block;
+    display: block;
+    width: max-content;
+  }
+  .bi-motto-title span + span {
+    margin-left: 0.9em; /* second line steps in, like a carved inscription */
   }
   .bi-motto-text {
     display: grid;
@@ -427,9 +465,17 @@ const principles = [
   .bi-motto-text p {
     margin: 0 0 var(--space-4);
   }
+  .bi-motto-text p {
+    font-size: var(--text-small);
+    line-height: var(--leading-small);
+  }
   @media (min-width: 1024px) {
     .bi-motto-text {
       grid-template-columns: repeat(3, 1fr);
+    }
+    .bi-motto-text p {
+      font-size: var(--text-body);
+      line-height: var(--leading-body);
     }
   }
   /* The title wipes in once, the first time it scrolls into view.
@@ -437,6 +483,9 @@ const principles = [
   :global(.js) .bi-motto-title span {
     clip-path: inset(0 100% 0 0);
     transition: clip-path 1100ms var(--ease-in-out);
+  }
+  :global(.js) .bi-motto-title span + span {
+    transition-delay: 180ms;
   }
   :global(.js) .bi-motto-title.is-in span {
     clip-path: inset(0 0 0 0);
@@ -573,6 +622,31 @@ const principles = [
 
 <script>
   document.documentElement.classList.add('js');
+
+  // Size each section to exactly one or two screens.
+  const sections = document.querySelectorAll<HTMLElement>('.bi-screen');
+  const size = () => {
+    const bar = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar-h')) * 16 || 56;
+    const screen = window.innerHeight - bar;
+    sections.forEach((s) => {
+      s.removeAttribute('data-h');
+      const cs = getComputedStyle(s);
+      const inner = s.firstElementChild as HTMLElement;
+      const needed = inner.offsetHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+      const h = needed <= screen + 1 ? 1 : needed <= 2 * screen ? 2 : 0;
+      if (h) {
+        s.dataset.h = String(h);
+        s.style.setProperty('--h', String(h));
+      }
+    });
+  };
+  size();
+  document.fonts?.ready.then(size);
+  let t: number | undefined;
+  addEventListener('resize', () => {
+    clearTimeout(t);
+    t = window.setTimeout(size, 150);
+  });
   const title = document.querySelector('.bi-motto-title');
   if (title) {
     if ('IntersectionObserver' in window) {
