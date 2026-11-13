@@ -1,0 +1,57 @@
+---
+/** Home / Category / Watch trail, with matching schema.org data for Google. */
+interface Props {
+  trail: { name: string; href?: string }[];
+}
+const { trail } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const full = [{ name: 'Home', href: `${base}/` }, ...trail];
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: full.map((t, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: t.name,
+    ...(t.href ? { item: new URL(t.href, Astro.site).href } : {}),
+  })),
+};
+---
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol role="list">
+    {full.map((t, i) => (
+      <li>
+        {t.href && i < full.length - 1 ? <a href={t.href}>{t.name}</a> : <span aria-current="page">{t.name}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+
+<style>
+  .crumbs ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+    font-size: var(--text-small);
+    color: var(--text-muted);
+  }
+  .crumbs li + li::before {
+    content: '/';
+    margin-right: var(--space-2);
+    opacity: 0.6;
+  }
+  .crumbs a {
+    display: inline-block;
+    padding-block: 11px; /* 44px tap height */
+    margin-block: -11px;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  }
+  .crumbs a:hover {
+    text-decoration-color: currentColor;
+  }
+</style>

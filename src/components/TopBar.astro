@@ -1,13 +1,15 @@
 ---
 /**
  * Small top menu bar: the name (home) on the left, one link per branch
- * on the right. Links come from src/data/branches.ts.
+ * on the right: the main branches in src/data/branches.ts plus every
+ * category in src/content/categories/.
  */
 import Logo from './Logo.astro';
-import { branches } from '../data/branches';
+import { getWebBranches } from '../data/catalog';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const here = Astro.url.pathname.replace(/\/?$/, '/');
+const branches = await getWebBranches();
 ---
 
 <header class="topbar" data-ground="parchment">
@@ -21,7 +23,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
           const href = `${base}/${b.href}`;
           return (
             <li>
-              <a class="topbar-link" href={href} aria-current={here === href ? 'page' : undefined}>
+              <a class="topbar-link" href={href} aria-current={here === href ? 'page' : here.startsWith(href) ? 'true' : undefined}>
                 {b.title}
               </a>
             </li>
@@ -79,7 +81,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
   }
   .topbar-link:hover,
   .topbar-link:focus-visible,
-  .topbar-link[aria-current='page'] {
+  .topbar-link[aria-current] {
     text-decoration-color: currentColor;
   }
 </style>

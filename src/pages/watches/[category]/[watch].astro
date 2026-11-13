@@ -1,0 +1,325 @@
+---
+/**
+ * A watch page: /watches/<category>/<watch>/
+ * One is made for every folder in src/content/watches/. You don't edit this
+ * file to add a watch; see docs/adding-content.md.
+ */
+import { getEntry, render } from 'astro:content';
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TopBar from '../../../components/TopBar.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Logo from '../../../components/Logo.astro';
+import {
+  getWatches,
+  categoryHref,
+  watchHref,
+  formatPrice,
+  statusLabel,
+  type Watch,
+} from '../../../data/catalog';
+import { organization, SITE_URL } from '../../../data/site';
+
+export async function getStaticPaths() {
+  const watches = await getWatches();
+  return watches.map((watch) => ({
+    params: { category: watch.data.category.id, watch: watch.id },
+    props: { watch },
+  }));
+}
+
+interface Props {
+  watch: Watch;
+}
+const { watch } = Astro.props;
+const d = watch.data;
+const category = await getEntry(d.category);
+const { Content } = await render(watch);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const url = `${SITE_URL}${watchHref(watch)}`;
+const [hero, ...gallery] = d.photos;
+
+// Share image: the first photo cropped to 1200 x 630
+const og = hero
+  ? await getImage({ src: hero.src, width: 1200, height: 630, fit: 'cover', format: 'jpg' })
+  : undefined;
+
+const offerStatus: Record<string, string> = {
+  available: 'https://schema.org/InStock',
+  'pre-order': 'https://schema.org/PreOrder',
+  'sold out': 'https://schema.org/SoldOut',
+};
+const photoUrls = await Promise.all(
+  d.photos.map(async (p) => new URL((await getImage({ src: p.src, width: 1600 })).src, Astro.site).href)
+);
+const product = {
+  '@type': 'Product',
+  '@id': `${url}#product`,
+  name: d.name,
+  description: d.description ?? d.summary,
+  url,
+  brand: { '@type': 'Brand', name: 'Monasterie' },
+  manufacturer: { '@id': organization['@id'] },
+  category: category?.data.title,
+  ...(photoUrls.length ? { image: photoUrls } : {}),
+  ...(d.price && offerStatus[d.status]
+    ? {
+        offers: {
+          '@type': 'Offer',
+          price: d.price.amount,
+          priceCurrency: d.price.currency,
+          availability: offerStatus[d.status],
+          url,
+        },
+      }
+    : {}),
+};
+---
+
+<BaseLayout
+  title={`${d.name} | Monasterie Watch Company`}
+  description={d.description ?? d.summary}
+  image={og?.src}
+  imageAlt={hero?.alt}
+  ground="parchment"
+  jsonLd={{ '@context': 'https://schema.org', '@graph': [organization, product] }}
+>
+  <TopBar />
+  <main id="main">
+    <!-- Hero: first photo and the essentials -->
+    <section class="w-hero">
+      <div class="wrap">
+        <Breadcrumbs
+          trail={[
+            { name: category?.data.title ?? 'Watches', href: `${base}/${categoryHref(d.category.id)}` },
+            { name: d.name },
+          ]}
+        />
+        <div class:list={['w-hero-grid', { 'no-photo': !hero }]}>
+          <figure class="w-hero-photo">
+            {hero ? (
+              <Image
+                src={hero.src}
+                alt={hero.alt}
+                widths={[600, 900, 1400]}
+                sizes="(min-width: 900px) 50vw, 100vw"
+                loading="eager"
+                fetchpriority="high"
+              />
+            ) : (
+              <span class="w-empty" data-ground="plum">
+                <Logo variant="icon" height="36%" decorative />
+              </span>
+            )}
+          </figure>
+          <div class="w-hero-text">
+            <p class="label muted">{category?.data.title}</p>
+            <h1>{d.name}</h1>
+            <p class="w-summary">{d.summary}</p>
+            <dl class="w-facts">
+              <div><dt>Price</dt><dd>{formatPrice(d.price)}</dd></div>
+              <div><dt>Status</dt><dd>{statusLabel(d.status)}</dd></div>
+            </dl>
+            {d.specs.length > 0 && <a class="btn btn-secondary" href="#specs">See the specifications</a>}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- More photos -->
+    {gallery.length > 0 && (
+      <section class="w-gallery" aria-label="Photos">
+        <div class="wrap">
+          <ul class="w-gallery-grid" role="list">
+            {gallery.map((p) => (
+              <li>
+                <Image src={p.src} alt={p.alt} widths={[600, 1000]} sizes="(min-width: 768px) 45vw, 100vw" />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    <!-- Story / design notes from the Markdown body -->
+    <section class="w-story" aria-label="About this watch">
+      <div class="wrap w-prose"><Content /></div>
+    </section>
+
+    <!-- Specifications -->
+    {d.specs.length > 0 && (
+      <section class="w-specs" id="specs" aria-labelledby="specs-title">
+        <div class="wrap">
+          <h2 id="specs-title">Specifications</h2>
+          <div class="w-spec-groups">
+            {d.specs.map((g) => (
+              <div class="w-spec-group">
+                <h3>{g.group}</h3>
+                <dl>
+                  {g.rows.map((r) => (
+                    <div class="w-spec-row">
+                      <dt>{r.label}</dt>
+                      <dd>{r.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <nav class="w-back wrap" aria-label="Category">
+      <a href={`${base}/${categoryHref(d.category.id)}`}>All {category?.data.title} watches</a>
+    </nav>
+  </main>
+</BaseLayout>
+
+<style>
+  .w-hero {
+    padding-block: var(--space-6) var(--space-8);
+  }
+  .w-hero-grid {
+    display: grid;
+    gap: var(--space-7);
+    align-items: center;
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 900px) {
+    .w-hero-grid {
+      grid-template-columns: 6fr 5fr;
+    }
+  }
+  .w-hero-photo {
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    max-height: 78svh;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-plum) 10%, var(--color-parchment));
+  }
+  .w-hero-photo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .w-empty {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  .w-empty :global(.logo) {
+    width: auto;
+  }
+  .w-hero-text h1 {
+    margin: var(--space-2) 0 var(--space-4);
+  }
+  .w-summary {
+    font-size: var(--text-h4);
+    line-height: 1.5;
+  }
+  .w-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin: var(--space-6) 0;
+    padding-top: var(--space-5);
+    border-top: var(--border-width) solid var(--color-cerulean);
+  }
+  .w-facts dt {
+    font-size: var(--text-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .w-facts dd {
+    margin: var(--space-1) 0 0;
+    font-family: var(--font-heading);
+    font-weight: var(--weight-heading);
+    font-size: var(--text-h3);
+    color: var(--heading);
+  }
+
+  .w-gallery {
+    padding-block: var(--space-6);
+  }
+  .w-gallery-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--grid-gutter);
+  }
+  @media (min-width: 768px) {
+    .w-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .w-gallery-grid li {
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .w-gallery-grid :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .w-story {
+    padding-block: var(--space-8);
+  }
+  .w-prose {
+    max-width: calc(42rem + 2 * var(--grid-margin));
+  }
+  .w-prose :global(h2) {
+    margin-top: var(--space-7);
+  }
+  .w-prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .w-specs {
+    padding-block: var(--space-8);
+    border-top: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+    scroll-margin-top: var(--bar-h);
+  }
+  .w-spec-groups {
+    display: grid;
+    gap: var(--space-7) var(--space-8);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .w-spec-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .w-spec-group h3 {
+    font-size: var(--text-h4);
+    margin-bottom: var(--space-3);
+  }
+  .w-spec-group dl {
+    margin: 0;
+  }
+  .w-spec-row {
+    display: grid;
+    grid-template-columns: minmax(8rem, 2fr) 3fr;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-bottom: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+    font-size: var(--text-small);
+  }
+  .w-spec-row dt {
+    color: var(--text-muted);
+  }
+  .w-spec-row dd {
+    margin: 0;
+  }
+
+  .w-back {
+    padding-block: var(--space-6) var(--space-9);
+  }
+  .w-back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
+</style>

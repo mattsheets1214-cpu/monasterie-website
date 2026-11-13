@@ -1,0 +1,62 @@
+---
+/**
+ * Main branch page: {{NAME}}
+ * Created from templates/branch-page.astro. Fill in the TODOs, add or remove
+ * sections, and see src/pages/brand-identity.astro for a full example
+ * (photos, a plum band, the marks).
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TopBar from '../components/TopBar.astro';
+---
+
+<BaseLayout
+  title="{{NAME}} | Monasterie Watch Company"
+  description="TODO: 120-160 characters saying what this page covers, for Google and share previews."
+  ground="parchment"
+>
+  <TopBar />
+  <main id="main">
+    <section class="b-hero">
+      <div class="wrap">
+        <p class="label muted">Monasterie Watch Company</p>
+        <h1>{{NAME}}</h1>
+        <p class="b-lede">TODO: one or two sentences saying what this branch is about.</p>
+      </div>
+    </section>
+
+    <section class="b-section" aria-labelledby="b-first">
+      <div class="wrap">
+        <h2 id="b-first">TODO a heading with a noun in it</h2>
+        <p>TODO: the first part of the story.</p>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .b-hero {
+    min-height: calc(100svh - var(--bar-h));
+    display: flex;
+    align-items: center;
+    padding-block: var(--space-9);
+  }
+  .b-hero h1 {
+    margin: var(--space-3) 0 var(--space-4);
+  }
+  .b-lede {
+    font-size: var(--text-h4);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .b-section {
+    min-height: calc(100svh - var(--bar-h));
+    display: flex;
+    align-items: center;
+    padding-block: var(--space-9);
+    border-top: var(--border-width) solid color-mix(in srgb, var(--color-plum) 14%, transparent);
+  }
+  .b-section > .wrap,
+  .b-hero > .wrap {
+    width: 100%;
+  }
+</style>

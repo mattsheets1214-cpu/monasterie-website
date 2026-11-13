@@ -50,7 +50,9 @@ monasterie-website/
 │   ├── favicon.svg / .ico  #   tab icon
 │   └── og-image.png        #   link-preview image
 ├── src/
-│   ├── components/         # Reusable pieces of UI (Logo.astro + logo-paths.ts)
+│   ├── content/            # Categories and watches (Markdown + photos), see docs/
+│   ├── components/         # Reusable pieces of UI (Logo, TopBar, Seal, WatchCard, Breadcrumbs)
+│   ├── data/               # Branch list, catalog helpers, site facts for Google
 │   ├── layouts/            # Page shells: <head>, fonts, shared wrapper (BaseLayout.astro)
 │   ├── pages/              # Every file here becomes a URL
 │   │   ├── index.astro     #   → the homepage (/)
@@ -58,26 +60,25 @@ monasterie-website/
 │   └── styles/
 │       ├── tokens.css      # Design tokens: colors, fonts, type scale, spacing, radius, grid
 │       └── global.css      # Fonts, base styles, .wrap/.grid, headings, buttons
+├── docs/                   # How-to guides (adding content)
+├── scripts/new.mjs         # `npm run new`: creates branches, categories and watches
+├── templates/              # What `npm run new` copies from
 ├── astro.config.mjs        # Astro settings (site URL + base path for GitHub Pages)
 ├── package.json            # Dependencies and npm scripts
 └── tsconfig.json           # TypeScript settings for editor support
 ```
 
-## Homepage web: adding a branch
+## Adding branches, categories and watches
 
-The homepage is the seal with branches drawn out to nodes; on phones it becomes the seal with a plain list. The branches, and the links in the top menu bar, all come from one file: `src/data/branches.ts`. To add one, add an entry:
+The homepage is the wordmark with branches drawn out to nodes; on phones it becomes the wordmark with a plain list. There are three kinds of thing you can add, each with a template and one command:
 
-```ts
-{
-  title: 'Engineering',
-  href: 'engineering/',          // the page it opens (create src/pages/engineering.astro)
-  blurb: 'Cases, movements and how we build them.',
-  icon: 'icon',
-  // angle: 180,                 // optional: 0 right, 90 down, 180 left, 270 up
-},
+```bash
+npm run new -- branch "Engineering"                          # a main branch with its own page
+npm run new -- category "Motorsport"                         # a watch category (web node + page)
+npm run new -- watch "Race Weekend" --category motorsport    # a watch: photos, price, full specs
 ```
 
-Branches spread evenly around the seal unless you set `angle`. The seal itself lives in `src/components/Seal.astro`, so the finished seal artwork can replace it there.
+New categories and watches start as drafts: they show in `npm run dev`, not on the live site, until you set `draft: false`. The full guide, including how to do it on github.com without a computer set up, is in **[docs/adding-content.md](docs/adding-content.md)**.
 
 ## Design tokens and the style guide
 

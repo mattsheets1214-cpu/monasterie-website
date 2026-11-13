@@ -1,0 +1,111 @@
+---
+/**
+ * A category page: /watches/<category>/
+ * One is made for every file in src/content/categories/. You don't edit this
+ * file to add a category; see docs/adding-content.md.
+ */
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import TopBar from '../../../components/TopBar.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import WatchCard from '../../../components/WatchCard.astro';
+import { getCategories, getWatches, categoryHref, type Category } from '../../../data/catalog';
+import { organization, SITE_URL } from '../../../data/site';
+
+export async function getStaticPaths() {
+  const cats = await getCategories();
+  return cats.map((category) => ({ params: { category: category.id }, props: { category } }));
+}
+
+interface Props {
+  category: Category;
+}
+const { category } = Astro.props;
+const { Content } = await render(category);
+const watches = await getWatches(category.id);
+const url = `${SITE_URL}${categoryHref(category.id)}`;
+---
+
+<BaseLayout
+  title={`${category.data.title} watches | Monasterie Watch Company`}
+  description={category.data.description ?? category.data.blurb}
+  ground="parchment"
+  jsonLd={{
+    '@context': 'https://schema.org',
+    '@graph': [
+      organization,
+      {
+        '@type': 'CollectionPage',
+        '@id': `${url}#page`,
+        url,
+        name: `${category.data.title} watches`,
+        isPartOf: { '@id': `${SITE_URL}#website` },
+      },
+    ],
+  }}
+>
+  <TopBar />
+  <main id="main">
+    <section class="cat-hero">
+      <div class="wrap">
+        <Breadcrumbs trail={[{ name: category.data.title }]} />
+        <p class="label muted cat-label">Watches</p>
+        <h1>{category.data.title}</h1>
+        <p class="cat-blurb">{category.data.blurb}</p>
+        <div class="cat-intro"><Content /></div>
+      </div>
+    </section>
+
+    <section class="cat-list" aria-labelledby="cat-list-title">
+      <div class="wrap">
+        <h2 id="cat-list-title" class="visually-hidden">{category.data.title} watches</h2>
+        {watches.length ? (
+          <ul class="cat-grid" role="list">
+            {watches.map((w) => (
+              <li><WatchCard watch={w} /></li>
+            ))}
+          </ul>
+        ) : (
+          <p class="muted">No watches in this category yet.</p>
+        )}
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .cat-hero {
+    padding-block: var(--space-7) var(--space-6);
+  }
+  .cat-label {
+    margin: var(--space-6) 0 var(--space-2);
+  }
+  h1 {
+    margin-bottom: var(--space-3);
+  }
+  .cat-blurb {
+    font-size: var(--text-h4);
+    line-height: 1.5;
+    color: var(--text-muted);
+  }
+  .cat-intro :global(p) {
+    max-width: 38rem;
+  }
+  .cat-list {
+    padding-block: var(--space-5) var(--space-9);
+  }
+  .cat-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-7) var(--grid-gutter);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 640px) {
+    .cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

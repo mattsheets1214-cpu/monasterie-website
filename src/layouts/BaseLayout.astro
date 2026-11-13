@@ -6,7 +6,8 @@ interface Props {
   title?: string;
   /** Shown under the title in Google and in some share previews (aim for 120-160 characters). */
   description?: string;
-  /** Share preview image in public/, 1200 x 630 PNG. */
+  /** Share preview image, 1200 x 630: a file name in public/ (e.g. og-image.png)
+      or a site path starting with / (e.g. a generated watch photo). */
   image?: string;
   imageAlt?: string;
   /** Keep the page out of search engines (style guide, 404). */
@@ -29,7 +30,10 @@ const {
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Share previews and canonical links need full https:// addresses
-const ogImage = new URL(`${base}/${image}`, Astro.site).href;
+const ogImage = image.startsWith('/')
+  ? new URL(image, Astro.site).href
+  : new URL(`${base}/${image}`, Astro.site).href;
+const ogImageType = /\.jpe?g$/i.test(ogImage.split('?')[0]) ? 'image/jpeg' : 'image/png';
 const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 ---
 
@@ -52,7 +56,7 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:secure_url" content={ogImage} />
-    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:type" content={ogImageType} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={imageAlt} />
