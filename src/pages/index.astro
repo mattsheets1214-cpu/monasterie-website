@@ -1,0 +1,77 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BellTower from '../components/BellTower.astro';
+---
+
+<BaseLayout>
+  <main>
+    <div class="mark"><BellTower size={64} /></div>
+    <h1>Monasterie</h1>
+    <p class="sub">Watch Company</p>
+    <p class="motto">Conversatio Morum</p>
+    <hr />
+    <p class="lede">
+      A workshop for designing watches, from the timeless to the futuristic.
+      Built to keep your hours with care.
+    </p>
+    <p class="soon">Site under construction</p>
+  </main>
+</BaseLayout>
+
+<style>
+  main {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 1.5rem;
+  }
+  .mark {
+    color: var(--bronze);
+    margin-bottom: 1.5rem;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: clamp(3rem, 9vw, 5.5rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
+    padding-left: 0.18em; /* optically re-centre tracked caps */
+  }
+  .sub {
+    font-size: 0.8rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin: 1rem 0 0;
+    padding-left: 0.4em;
+  }
+  .motto {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.35rem;
+    margin: 2rem 0 0;
+  }
+  hr {
+    width: 48px;
+    border: 0;
+    border-top: 1px solid var(--bronze);
+    margin: 2rem auto;
+  }
+  .lede {
+    max-width: 32rem;
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .soon {
+    margin-top: 3rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+</style>

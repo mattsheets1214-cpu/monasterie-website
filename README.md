@@ -1,0 +1,92 @@
+# Monasterie Watch Company — Website
+
+*Conversatio Morum.*
+
+The website for Monasterie Watch Company, built with [Astro](https://astro.build) and deployed automatically to GitHub Pages.
+
+**Live site:** https://mattsheets1214-cpu.github.io/monasterie-website/
+
+---
+
+## Run it locally
+
+You need [Node.js](https://nodejs.org) 22 or newer (check with `node --version`).
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/mattsheets1214-cpu/monasterie-website.git
+cd monasterie-website
+
+# 2. Install dependencies (first time only, or after package.json changes)
+npm install
+
+# 3. Start the dev server
+npm run dev
+```
+
+Open the URL it prints (usually http://localhost:4321/monasterie-website/). The page reloads automatically as you edit files.
+
+| Command           | What it does                                          |
+| ----------------- | ----------------------------------------------------- |
+| `npm run dev`     | Local dev server with live reload                     |
+| `npm run build`   | Builds the production site into `dist/`               |
+| `npm run preview` | Serves the built `dist/` folder to check it before pushing |
+
+## How deploying works
+
+Every push to the `main` branch triggers `.github/workflows/deploy.yml`, which builds the site and publishes it to GitHub Pages. It usually takes 1–2 minutes. You can watch progress (or re-run a deploy manually) in the repo's **Actions** tab.
+
+No manual steps: edit, commit, push to `main`, and the live site updates.
+
+## How the folders are organized
+
+```
+monasterie-website/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml      # GitHub Actions: build + deploy to Pages on push to main
+├── public/                 # Static files copied as-is (favicon, images, PDFs)
+│   └── favicon.svg
+├── src/
+│   ├── components/         # Reusable pieces of UI (e.g. BellTower.astro logo)
+│   ├── layouts/            # Page shells: <head>, fonts, shared wrapper (BaseLayout.astro)
+│   ├── pages/              # Every file here becomes a URL
+│   │   └── index.astro     #   → the homepage (/)
+│   └── styles/
+│       └── global.css      # Brand colors, fonts, site-wide styles
+├── astro.config.mjs        # Astro settings (site URL + base path for GitHub Pages)
+├── package.json            # Dependencies and npm scripts
+└── tsconfig.json           # TypeScript settings for editor support
+```
+
+### Adding a new page
+
+Create a file in `src/pages/`. The filename becomes the URL:
+
+- `src/pages/about.astro` → `/monasterie-website/about`
+- `src/pages/watches/f1.astro` → `/monasterie-website/watches/f1`
+
+Wrap the content in `BaseLayout` so it gets the shared head and styles:
+
+```astro
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="About — Monasterie">
+  <h1>About</h1>
+</BaseLayout>
+```
+
+### Linking and images
+
+Because the site lives under `/monasterie-website/`, build internal links and asset paths with the base URL:
+
+```astro
+<a href={`${import.meta.env.BASE_URL}/about`}>About</a>
+```
+
+Put images in `public/` (e.g. `public/images/eyelid.jpg`) to reference them by path, or in `src/assets/` to let Astro optimize them.
+
+## Custom domain (later)
+
+To use a domain like `monasterie.com`: add it under **Settings → Pages → Custom domain**, then in `astro.config.mjs` set `site` to `https://monasterie.com` and delete the `base` line.
